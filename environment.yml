@@ -1,0 +1,22 @@
+# For developers only:
+#  Remove the cmorfixer environment and clean the downloaded conda cache:
+#   conda deactivate
+#   conda-env remove -y -n cmorfixer
+#   conda clean --all -y
+#  Create the cmorfixer environment:
+#   conda update -n base -c defaults conda        # For updating conda itself if you like
+#   conda env create -f environment.yml
+#  Basic tests:
+#   ./fix_lons.py -h
+#  Miscelaneous relevant help commands:
+#   conda-env list
+#   conda list
+#   conda update --all
+
+name: cmorfixer
+channels:
+- conda-forge
+- defaults
+dependencies:
+- netcdf4
+- numpy
