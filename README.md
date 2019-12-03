@@ -52,7 +52,6 @@ conda env create -f environment.yml        # for linux & mac os
 
 ```shell
  conda activate cmorfixer
-  -h
   ./fix_lons.py -h
   ./fix_lons.py --verbose --dry /lustre2/projects/model_testing/reerink/cmorised-results/cmor-cmip-test-all-11/t002/ifs/001/CMIP6/
 
