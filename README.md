@@ -39,8 +39,8 @@ For example we create the directoy ${HOME}/cmorize/ for the cmor-fixer:
 git clone https://github.com/EC-Earth/cmor-fixer.git
 ```
 
-##### Creating a virtual conda environment and installing ece3cmor3 therein:
-In the ece2cmor3 git checkout directory, type
+##### Creating a conda environment and installing cmor-fixer therein:
+In the cmor-fixer git checkout directory, type
 ```shell
 activateminiconda3                         # The alias as defined above
 conda update -y -n base -c defaults conda  # for updating conda itself
