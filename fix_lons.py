@@ -95,8 +95,10 @@ def main(args=None):
                         modified = fix_file(os.path.join(root, filepath), write, keepid, metadata)
                         if modified:
                             modified_files.append(os.path.join(root, filepath))
-        with open("modified_files.txt", 'w') as ofile:
-            ofile.writelines(modified_files)
+        if args.olist:
+            with open("modified_files.txt", 'w') as ofile:
+                for f in modified_files:
+                    ofile.write(f + '\n')
 
 
 if __name__ == "__main__":
