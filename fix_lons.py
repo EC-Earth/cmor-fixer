@@ -6,7 +6,7 @@ import json
 import netCDF4
 import logging
 import uuid
-import datetime
+#import datetime
 
 log = logging.getLogger(os.path.basename(__file__))
 
@@ -52,11 +52,11 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
         log.info("Setting tracking_id to %s for %s" % (tr_id, ds.filepath()))
         if write:
             setattr(ds, "tracking_id", tr_id)
-    if modified:
-        creation_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-        log.info("Setting creation_dr(ate to %s for %s" % (creation_date, ds.filepath()))
-        if write:
-            setattr(ds, "creation_date", creation_date)
+#    if modified:
+#        creation_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+#        log.info("Setting creation_dr(ate to %s for %s" % (creation_date, ds.filepath()))
+#        if write:
+#            setattr(ds, "creation_date", creation_date)
     ds.close()
     return modified
 
