@@ -11,9 +11,9 @@ import datetime
 log = logging.getLogger(os.path.basename(__file__))
 
 
-def fix_file(path, write=True, keepid=False, metadata=None):
+def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
     ds = netCDF4.Dataset(path, "r+" if write else "r")
-    modified = False
+    modified = forceid
     # TODO: Figure out whether this filters only IFS data:
     if getattr(ds, "grid_label") == "gr":
         lonvars = [v for v in ds.variables if getattr(ds.variables[v], "standard_name", "none").lower() == "longitude"]
@@ -67,14 +67,18 @@ def main(args=None):
     parser = argparse.ArgumentParser(description="Fix longitude coordinate (and opt. attributes) in cmorized files")
     parser.add_argument("datadir", metavar="DIR", type=str)
     parser.add_argument("--depth", "-d", type=int, help="Directory recursion depth (default: infinite)")
-    parser.add_argument("--verbose", "-v", action="store_true", default=False, help="Run verbosely (default: off)")
-    parser.add_argument("--dry", "-s", action="store_true", default=False, help="Dry run, no writing (default: no)")
+    parser.add_argument("--verbose", "-v", action="store_true", default=False,
+                        help="Run verbosely (default: off)")
+    parser.add_argument("--dry", "-s", action="store_true", default=False,
+                        help="Dry run, no writing (default: no)")
     parser.add_argument("--keepid", "-k", action="store_true", default=False,
                         help="Keep tracking id and creation date (default: no)")
+    parser.add_argument("--forceid", "-f", action="store_true", default=False,
+                        help="Force new tracking id and creation date (default: no)")
     parser.add_argument("--meta", metavar="FILE.json", type=str,
                         help="Input file to overwrite metadata (default: None)")
-    parser.add_argument("--olist", "-o", action="store_true", default=False, help="Write modified_files.txt listing "
-                                                                                  "all modified files")
+    parser.add_argument("--olist", "-o", action="store_true", default=False,
+                        help="Write modified_files.txt listing all modified files")
 
     args = parser.parse_args()
     logformat = "%(asctime)s %(levelname)s:%(name)s: %(message)s"
@@ -83,10 +87,11 @@ def main(args=None):
         logging.basicConfig(level=logging.DEBUG, format=logformat, datefmt=logdateformat)
     else:
         logging.basicConfig(level=logging.WARNING, format=logformat, datefmt=logdateformat)
+    if args.keepid and args.forceid:
+        log.error("Options keepid and forceid are mutually exclusive, please choose either one.")
+        return
     odir = args.datadir
     depth = getattr(args, "depth", None)
-    write = not args.dry
-    keepid = args.keepid
     metajson = getattr(args, "meta", None)
     metadata = None
     if metajson is not None:
@@ -98,7 +103,8 @@ def main(args=None):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
                     if filepath.endswith(".nc"):
-                        modified = fix_file(os.path.join(root, filepath), write, keepid, metadata)
+                        modified = fix_file(os.path.join(root, filepath), not args.dry, args.keepid,
+                                            args.forceid, metadata)
                         if modified:
                             modified_files.append(os.path.join(root, filepath))
         if args.olist:
