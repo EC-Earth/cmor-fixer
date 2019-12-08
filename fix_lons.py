@@ -14,7 +14,6 @@ log = logging.getLogger(os.path.basename(__file__))
 def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
     ds = netCDF4.Dataset(path, "r+" if write else "r")
     modified = forceid
-    # TODO: Figure out whether this filters only IFS data:
     if getattr(ds, "grid_label") == "gr":
         lonvars = [v for v in ds.variables if getattr(ds.variables[v], "standard_name", "none").lower() == "longitude"]
         if len(lonvars) > 1:
@@ -25,6 +24,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
                 continue
             lonvar = ds.variables[lonvarname]
             offset = lonvar[...].flat[0]
+            # IFS files only
             if offset > 0.:
                 log.info("Shifting longitude westward by %s for variable %s in %s" %
                          (str(offset), lonvarname, ds.filepath()))
@@ -40,6 +40,20 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
                         ds.variables[bndvarname][...] -= offset
                         modified = True
                     shifted_vars.add(bndvarname)
+            # LPJGuess files only
+            else:
+                bndvarname = getattr(lonvar, "bounds", None)
+                if bndvarname is not None and bndvarname not in shifted_vars:
+                    bndvar = ds.variables[bndvarname]
+                    lowerbnd = bndvar[...].flat[0]
+                    if lowerbnd == offset:
+                        shift = 0.5 * (lonvar[...].flat[1] - offset)
+                        log.info("Shifting longitude bounds westward by %s for variable %s in %s" %
+                                 (str(shift), lonvarname, ds.filepath()))
+                        if write:
+                            ds.variables[bndvarname][...] -= shift
+                            modified = True
+                        shifted_vars.add(bndvarname)
     if metadata is not None:
         for key, val in metadata:
             if getattr(ds, key, None) != val:
