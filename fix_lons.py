@@ -8,6 +8,8 @@ import logging
 import uuid
 #import datetime
 
+version = 'v0.9'
+
 log = logging.getLogger(os.path.basename(__file__))
 
 
@@ -30,7 +32,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
                          (str(offset), lonvarname, ds.filepath()))
                 if write:
                     lonvar[...] -= offset
-                    modified = True
+                modified = True
                 shifted_vars.add(lonvarname)
                 bndvarname = getattr(lonvar, "bounds", None)
                 if bndvarname is not None and bndvarname not in shifted_vars:
@@ -38,7 +40,6 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
                              (str(offset), lonvarname, ds.filepath()))
                     if write:
                         ds.variables[bndvarname][...] -= offset
-                        modified = True
                     shifted_vars.add(bndvarname)
             # LPJGuess files only
             else:
@@ -52,7 +53,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
                                  (str(shift), lonvarname, ds.filepath()))
                         if write:
                             ds.variables[bndvarname][...] -= shift
-                            modified = True
+                        modified = True
                         shifted_vars.add(bndvarname)
     if metadata is not None:
         for key, val in metadata:
@@ -60,12 +61,17 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
                 log.info("Setting metadata field %s to %s in %s" % (key, val, ds.filepath()))
                 if write:
                     setattr(ds, key, val)
-                    modified = True
+                modified = True
     if modified and not keepid:
         tr_id = '/'.join(["hdl:21.14100", (str(uuid.uuid4()))])
         log.info("Setting tracking_id to %s for %s" % (tr_id, ds.filepath()))
         if write:
             setattr(ds, "tracking_id", tr_id)
+    if modified:
+        history = getattr(ds, "history", "")
+        log.info("Appending message about modification to the history attribute.")
+        if write:
+            setattr(ds, "history", history + 'The cmor-fixer version %s script has been applied.' % (version))
 #    if modified:
 #        creation_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 #        log.info("Setting creation_dr(ate to %s for %s" % (creation_date, ds.filepath()))
