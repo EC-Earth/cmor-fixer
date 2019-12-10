@@ -85,7 +85,7 @@ def main(args=None):
     if args is None:
         pass
     parser = argparse.ArgumentParser(description="Fix longitude coordinate (and opt. attributes) in cmorized files")
-    parser.add_argument("datadir", metavar="DIR", type=str)
+    parser.add_argument("datadir", metavar="DIR", type=str, help="Directory containing cmorized files")
     parser.add_argument("--depth", "-d", type=int, help="Directory recursion depth (default: infinite)")
     parser.add_argument("--verbose", "-v", action="store_true", default=False,
                         help="Run verbosely (default: off)")
@@ -117,20 +117,22 @@ def main(args=None):
     if metajson is not None:
         with open(metajson) as jsonfile:
             metadata = json.load(jsonfile)
-    if os.path.exists(odir):
-        modified_files = []
-        for root, dirs, files in os.walk(odir):
-            if depth is None or root[len(odir):].count(os.sep) < int(depth):
-                for filepath in files:
-                    if filepath.endswith(".nc"):
-                        modified = fix_file(os.path.join(root, filepath), not args.dry, args.keepid,
-                                            args.forceid, metadata)
-                        if modified:
-                            modified_files.append(os.path.join(root, filepath))
-        if args.olist:
-            with open("modified_files.txt", 'w') as ofile:
-                for f in modified_files:
-                    ofile.write(f + '\n')
+    if not os.path.isdir(odir):
+        log.error("Data directory argument %s is not a valid directory: skipping fix" % odir)
+        return
+    modified_files = []
+    for root, dirs, files in os.walk(odir):
+        if depth is None or root[len(odir):].count(os.sep) < int(depth):
+            for filepath in files:
+                if filepath.endswith(".nc"):
+                    modified = fix_file(os.path.join(root, filepath), not args.dry, args.keepid,
+                                        args.forceid, metadata)
+                    if modified:
+                        modified_files.append(os.path.join(root, filepath))
+    if args.olist:
+        with open("modified_files.txt", 'w') as ofile:
+            for f in modified_files:
+                ofile.write(f + '\n')
 
 
 if __name__ == "__main__":
