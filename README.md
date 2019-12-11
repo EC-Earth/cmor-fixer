@@ -57,3 +57,18 @@ conda env create -f environment.yml        # for linux & mac os
 
  conda deactivate
 ```
+
+##### Adjust the version directory name after the cmor-fixer.py script has been applied
+
+First run the `version.sh` script, for its help use:
+```shell
+./versions.sh -h
+```
+In order to see whether there is more than one version in your data:
+```shell
+./versions.sh -l CMIP6/
+```
+If so (this happens when during running the script the date changed because you crossed midnight), you need to set one version (you can choose what you want, but it should be a different and later date than the one which was previously published). This can be applied by:
+```shell
+./versions.sh -v v20191220 -m CMIP6/
+```
