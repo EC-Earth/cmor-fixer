@@ -94,13 +94,15 @@ def main(args=None):
     parser.add_argument("--dry", "-s", action="store_true", default=False,
                         help="Dry run, no writing (default: no)")
     parser.add_argument("--keepid", "-k", action="store_true", default=False,
-                        help="Keep tracking id and creation date (default: no)")
+                        help="Keep tracking id (default: no)")
+#                       help="Keep tracking id and creation date (default: no)")
     parser.add_argument("--forceid", "-f", action="store_true", default=False,
-                        help="Force new tracking id and creation date (default: no)")
+                        help="Force new tracking id (default: no)")
+#                       help="Force new tracking id and creation date (default: no)")
     parser.add_argument("--meta", metavar="FILE.json", type=str,
                         help="Input file to overwrite metadata (default: None)")
     parser.add_argument("--olist", "-o", action="store_true", default=False,
-                        help="Write modified_files.txt listing all modified files")
+                        help="Write list-of-modified-files.txt listing all modified files")
     parser.add_argument("--npp", type=int, default=1, help="Number of sub-processes to launch (default 1)")
 
     args = parser.parse_args()
@@ -154,7 +156,7 @@ def main(args=None):
                 modified_files.append(considered_files[i])
 
     if args.olist:
-        with open("modified_files.txt", 'w') as ofile:
+        with open("list-of-modified-files.txt", 'w') as ofile:
             for f in modified_files:
                 ofile.write(f + '\n')
 
