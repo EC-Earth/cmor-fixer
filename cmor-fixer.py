@@ -7,6 +7,7 @@ import netCDF4
 import logging
 import uuid
 import multiprocessing
+from functools import partial
 
 # import datetime
 
@@ -128,10 +129,8 @@ def main(args=None):
         return
     modified_files = []
 
-    def worker(ncfile):
-        return fix_file(ncfile, not args.dry, args.keepid, args.forceid, metadata)
-
     if args.npp == 1:
+        worker = partial(fix_file, write=not args.dry, keepid=args.keepid, forceid=args.forceid, metadata=metadata)
         for root, dirs, files in os.walk(odir):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
@@ -148,7 +147,8 @@ def main(args=None):
                     if filepath.endswith(".nc"):
                         considered_files.append(os.path.join(root, filepath))
         pool = multiprocessing.Pool(processes=args.npp)
-        modifications = pool.map(worker, considered_files)
+        modifications = pool.map(partial(fix_file, write=not args.dry, keepid=args.keepid, forceid=args.forceid,
+                                         metadata=metadata), considered_files)
         for i in range(len(modifications)):
             if modifications[i]:
                 modified_files.append(considered_files[i])
