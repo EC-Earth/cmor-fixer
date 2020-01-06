@@ -7,7 +7,7 @@
 #   conda update -n base -c defaults conda        # For updating conda itself if you like
 #   conda env create -f environment.yml
 #  Basic tests:
-#   ./fix_lons.py -h
+#   ./cmor-fixer.py -h
 #  Miscelaneous relevant help commands:
 #   conda-env list
 #   conda list

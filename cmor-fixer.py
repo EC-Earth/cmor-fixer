@@ -6,7 +6,10 @@ import json
 import netCDF4
 import logging
 import uuid
-#import datetime
+import multiprocessing
+from functools import partial
+
+# import datetime
 
 version = 'v0.9'
 
@@ -72,11 +75,11 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
         log.info("Appending message about modification to the history attribute.")
         if write:
             setattr(ds, "history", history + 'The cmor-fixer version %s script has been applied.' % (version))
-#    if modified:
-#        creation_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-#        log.info("Setting creation_dr(ate to %s for %s" % (creation_date, ds.filepath()))
-#        if write:
-#            setattr(ds, "creation_date", creation_date)
+    #    if modified:
+    #        creation_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    #        log.info("Setting creation_dr(ate to %s for %s" % (creation_date, ds.filepath()))
+    #        if write:
+    #            setattr(ds, "creation_date", creation_date)
     ds.close()
     return modified
 
@@ -92,13 +95,16 @@ def main(args=None):
     parser.add_argument("--dry", "-s", action="store_true", default=False,
                         help="Dry run, no writing (default: no)")
     parser.add_argument("--keepid", "-k", action="store_true", default=False,
-                        help="Keep tracking id and creation date (default: no)")
+                        help="Keep tracking id (default: no)")
+#                       help="Keep tracking id and creation date (default: no)")
     parser.add_argument("--forceid", "-f", action="store_true", default=False,
-                        help="Force new tracking id and creation date (default: no)")
+                        help="Force new tracking id (default: no)")
+#                       help="Force new tracking id and creation date (default: no)")
     parser.add_argument("--meta", metavar="FILE.json", type=str,
                         help="Input file to overwrite metadata (default: None)")
     parser.add_argument("--olist", "-o", action="store_true", default=False,
-                        help="Write modified_files.txt listing all modified files")
+                        help="Write list-of-modified-files.txt listing all modified files")
+    parser.add_argument("--npp", type=int, default=1, help="Number of sub-processes to launch (default 1)")
 
     args = parser.parse_args()
     logformat = "%(asctime)s %(levelname)s:%(name)s: %(message)s"
@@ -120,17 +126,37 @@ def main(args=None):
     if not os.path.isdir(odir):
         log.error("Data directory argument %s is not a valid directory: skipping fix" % odir)
         return
+    if args.npp < 1:
+        log.error("Invalid number of subprocesses chosen, please pick a number > 0")
+        return
     modified_files = []
-    for root, dirs, files in os.walk(odir):
-        if depth is None or root[len(odir):].count(os.sep) < int(depth):
-            for filepath in files:
-                if filepath.endswith(".nc"):
-                    modified = fix_file(os.path.join(root, filepath), not args.dry, args.keepid,
-                                        args.forceid, metadata)
-                    if modified:
-                        modified_files.append(os.path.join(root, filepath))
+
+    if args.npp == 1:
+        worker = partial(fix_file, write=not args.dry, keepid=args.keepid, forceid=args.forceid, metadata=metadata)
+        for root, dirs, files in os.walk(odir):
+            if depth is None or root[len(odir):].count(os.sep) < int(depth):
+                for filepath in files:
+                    if filepath.endswith(".nc"):
+                        ncfile = os.path.join(root, filepath)
+                        modified = worker(ncfile)
+                        if modified:
+                            modified_files.append(ncfile)
+    else:
+        considered_files = []
+        for root, dirs, files in os.walk(odir):
+            if depth is None or root[len(odir):].count(os.sep) < int(depth):
+                for filepath in files:
+                    if filepath.endswith(".nc"):
+                        considered_files.append(os.path.join(root, filepath))
+        pool = multiprocessing.Pool(processes=args.npp)
+        modifications = pool.map(partial(fix_file, write=not args.dry, keepid=args.keepid, forceid=args.forceid,
+                                         metadata=metadata), considered_files)
+        for i in range(len(modifications)):
+            if modifications[i]:
+                modified_files.append(considered_files[i])
+
     if args.olist:
-        with open("modified_files.txt", 'w') as ofile:
+        with open("list-of-modified-files.txt", 'w') as ofile:
             for f in modified_files:
                 ofile.write(f + '\n')
 
