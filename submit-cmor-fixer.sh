@@ -26,7 +26,7 @@
  if [ "$#" -eq 0 ]; then
 
    CMORISEDDIR=/lustre2/projects/model_testing/reerink/cmorised-results/cmor-cmip-test-all-11/t002/ifs/001/CMIP6/
-   METADATA=/nfs/home/users/reerink/ec-earth-3/branch-r7438-control-output-files/runtime/classic/ctrl/cmip6-output-control-files/CMIP/EC-EARTH-AOGCM/cmip6-experiment-CMIP-piControl/metadata-cmip6-CMIP-piControl-EC-EARTH-AOGCM-$COMPONENT-template.json
+   METADATA=/nfs/home/users/reerink/ec-earth-3/trunk/runtime/classic/ctrl/cmip6-output-control-files/CMIP/EC-EARTH-AOGCM/cmip6-experiment-CMIP-piControl/metadata-cmip6-CMIP-piControl-EC-EARTH-AOGCM-ifs-template.json
 
    if [ -z "$CMORISEDDIR" ]; then echo "Error: Empty EC-Earth3 data output directory: " $CMORISEDDIR ", aborting" $0 >&2; exit 1; fi
 
@@ -36,12 +36,12 @@
    export HDF5_USE_FILE_LOCKING=FALSE
 
    ./cmor-fixer.py --verbose               \
-                   --dry                   \
                    --forceid               \
                    --olist                 \
                    --npp         28        \
                    $CMORISEDDIR
 
+                  #--dry                   \
                   #--keepid                \
                   #--meta        $METADATA \
 
