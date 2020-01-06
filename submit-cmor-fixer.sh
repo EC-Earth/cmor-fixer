@@ -30,20 +30,20 @@
 
    if [ -z "$CMORISEDDIR" ]; then echo "Error: Empty EC-Earth3 data output directory: " $CMORISEDDIR ", aborting" $0 >&2; exit 1; fi
 
-   export PATH="/lustre2/projects/model_testing/reerink/miniconda3/bin:$PATH"
+   source /lustre2/projects/model_testing/reerink/miniconda3/etc/profile.d/conda.sh
    conda activate cmorfixer
 
    export HDF5_USE_FILE_LOCKING=FALSE
-  #export UVCDAT_ANONYMOUS_LOG=false
 
    ./cmor-fixer.py --verbose               \
                    --dry                   \
-                  #--keepid                \
                    --forceid               \
-                  #--meta        $METADATA \
                    --olist                 \
-                   --npp         1         \
+                   --npp         28        \
                    $CMORISEDDIR
+
+                  #--keepid                \
+                  #--meta        $METADATA \
 
  else
   echo
