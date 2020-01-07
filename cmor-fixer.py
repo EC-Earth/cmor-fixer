@@ -44,7 +44,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
                     if write:
                         ds.variables[bndvarname][...] -= offset
                     shifted_vars.add(bndvarname)
-            # LPJGuess files only
+            # LPJ-GUESS files only
             else:
                 bndvarname = getattr(lonvar, "bounds", None)
                 if bndvarname is not None and bndvarname not in shifted_vars:
@@ -96,10 +96,8 @@ def main(args=None):
                         help="Dry run, no writing (default: no)")
     parser.add_argument("--keepid", "-k", action="store_true", default=False,
                         help="Keep tracking id (default: no)")
-#                       help="Keep tracking id and creation date (default: no)")
     parser.add_argument("--forceid", "-f", action="store_true", default=False,
                         help="Force new tracking id (default: no)")
-#                       help="Force new tracking id and creation date (default: no)")
     parser.add_argument("--meta", metavar="FILE.json", type=str,
                         help="Input file to overwrite metadata (default: None)")
     parser.add_argument("--olist", "-o", action="store_true", default=False,
