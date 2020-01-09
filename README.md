@@ -8,10 +8,10 @@ Python code to fix the incorrect longitude eastward shift of half a grid cell by
 * netCDF4
 * numpy
 
-## Installation:
+## 1. Installation
 
 
-#### Installation & running with miniconda3:
+#### Installation with miniconda3:
 The Miniconda python distribution should be installed. With miniconda all the packages can be installed within one go by the package manager `conda`. This applies also to systems where one is not allowed to install complementary python packages to the default python distribution.
 
 ##### If Miniconda3 is not yet installed:
@@ -29,7 +29,7 @@ One could consider to add the following aliases in the `.bashrc` file:
  minconda3path=${HOME}/miniconda3/                                 #  for instance on your laptop
  minconda3path=${PERM}/miniconda3/                                 #  for instance on cca
  ```
-
+ 
 
 ##### Download cmor-fixer by a git checkout
 
@@ -48,20 +48,37 @@ cd cmor-fixer
 conda env create -f environment.yml        # for linux & mac os
 ```
 
-##### Running the cmor-fixer inside the conda environment:
+## 2. Run cmor-fixer
 
+### Test cmor-fixer
+
+##### Running the cmor-fixer inside the conda environment:
 ```shell
 
  # Activate the cmor-fixer conda environment:
- activateminiconda3                         # The alias as defined above
+ activateminiconda3                        # The alias as defined above
  conda activate cmorfixer
  
- # Show with cmor-fixer help its argument options:
+ # The help of cmor-fixer list its argument options:
  ./cmor-fixer.py -h
  
  # A dry-run example which, due to the --forceid option, will give a new tracking id to any file
  # encountered including files with correct lon data:
  ./cmor-fixer.py --verbose --forceid --olist --npp 1 --dry CMIP6/
+ 
+ conda deactivate
+```
+
+### Apply cmor-fixer at the ESGF node to data which has been published at the ESGF node
+
+
+##### Running the cmor-fixer inside the conda environment:
+
+```shell
+
+ # Activate the cmor-fixer conda environment:
+ activateminiconda3                        # The alias as defined above
+ conda activate cmorfixer
 
  # An example in which cmor fixer is applying the lon & lon_bnds fix to the data:
  ./cmor-fixer.py --verbose --forceid --olist --npp 1 --dry CMIP6/
@@ -73,6 +90,12 @@ The `submit-cmor-fixer.sh` script is an `sbatch` template for a submit script wh
 ```shell
 sbatch submit-cmor-fixer.sh
 ```
+
+### Apply cmor-fixer to unpublished data
+
+...waiting for content...
+
+## 3. Adjust the version directory name
 
 ##### Adjust the version directory name after the cmor-fixer.py script has been applied
 
