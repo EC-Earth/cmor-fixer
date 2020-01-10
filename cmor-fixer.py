@@ -59,7 +59,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
                         modified = True
                         shifted_vars.add(bndvarname)
     if metadata is not None:
-        for key, val in metadata:
+        for key, val in metadata.items():
             if getattr(ds, key, None) != val:
                 log.info("Setting metadata field %s to %s in %s" % (key, val, ds.filepath()))
                 if write:
@@ -99,7 +99,8 @@ def main(args=None):
     parser.add_argument("--forceid", "-f", action="store_true", default=False,
                         help="Force new tracking id (default: no)")
     parser.add_argument("--meta", metavar="FILE.json", type=str,
-                        help="Input file to overwrite metadata (default: None)")
+                        help="Input file to overwrite metadata (default: None). WARNING: This will be applied to all "
+                             "nc files found recursively under datadir")
     parser.add_argument("--olist", "-o", action="store_true", default=False,
                         help="Write list-of-modified-files.txt listing all modified files")
     parser.add_argument("--npp", type=int, default=1, help="Number of sub-processes to launch (default 1)")
