@@ -60,10 +60,11 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
                         shifted_vars.add(bndvarname)
     if metadata is not None:
         for key, val in metadata.items():
-            if getattr(ds, key, None) != val:
-                log.info("Setting metadata field %s to %s in %s" % (key, val, ds.filepath()))
+            attname, attval = str(key), str(val)
+            if getattr(ds, attname, None) != attval:
+                log.info("Setting metadata field %s to %s in %s" % (attname, attval, ds.filepath()))
                 if write:
-                    setattr(ds, key, val)
+                    setattr(ds, attname, attval)
                 modified = True
     if modified and not keepid:
         tr_id = '/'.join(["hdl:21.14100", (str(uuid.uuid4()))])
@@ -99,8 +100,8 @@ def main(args=None):
     parser.add_argument("--forceid", "-f", action="store_true", default=False,
                         help="Force new tracking id (default: no)")
     parser.add_argument("--meta", metavar="FILE.json", type=str,
-                        help="Input file to overwrite metadata (default: None). WARNING: This will be applied to all "
-                             "nc files found recursively under datadir")
+                        help="Input file to overwrite metadata (default: None). WARNING: This will be applied to "
+                             "**ALL** netcdf files found recursively in your data directory")
     parser.add_argument("--olist", "-o", action="store_true", default=False,
                         help="Write list-of-modified-files.txt listing all modified files")
     parser.add_argument("--npp", type=int, default=1, help="Number of sub-processes to launch (default 1)")
