@@ -61,7 +61,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
     if metadata is not None:
         for key, val in metadata.items():
             attname, attval = str(key), str(val)
-            if getattr(ds, attname, None) != attval:
+            if not attname.startswith('#') and getattr(ds, attname, None) != attval:
                 log.info("Setting metadata field %s to %s in %s" % (attname, attval, ds.filepath()))
                 if write:
                     setattr(ds, attname, attval)
