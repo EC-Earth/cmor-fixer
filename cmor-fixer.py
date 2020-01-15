@@ -15,8 +15,10 @@ version = 'v1.0'
 
 log = logging.getLogger(os.path.basename(__file__))
 
+skipped_attributes = ["source", "comment"]
 
-def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
+
+def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
     ds = netCDF4.Dataset(path, "r+" if write else "r")
     modified = forceid
     if getattr(ds, "grid_label") == "gr":
@@ -61,7 +63,10 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None):
     if metadata is not None:
         for key, val in metadata.items():
             attname, attval = str(key), val
-            if not attname.startswith('#') and str(getattr(ds, attname, None)) != str(attval):
+            if attname.startswith('#') or attname in skipped_attributes:
+                continue
+            if (not hasattr(ds, attname) and add_attributes) or \
+                    (hasattr(ds, attname) and str(getattr(ds, attname)) != str(attval)):
                 log.info("Setting metadata field %s to %s in %s" % (attname, attval, ds.filepath()))
                 if write:
                     setattr(ds, attname, attval)
@@ -101,9 +106,12 @@ def main(args=None):
                         help="Force new tracking id (default: no)")
     parser.add_argument("--meta", metavar="FILE.json", type=str,
                         help="Input file to overwrite metadata (default: None). WARNING: This will be applied to "
-                             "**ALL** netcdf files found recursively in your data directory")
+                             "**ALL** netcdf files found recursively in your data directory. New attributes in this "
+                             "file will be skipped unless the --addatts option is used.")
     parser.add_argument("--olist", "-o", action="store_true", default=False,
                         help="Write list-of-modified-files.txt listing all modified files")
+    parser.add_argument("--addattrs", "-a", action="store_true", default=False,
+                        help="Add new attributes from metadata file")
     parser.add_argument("--npp", type=int, default=1, help="Number of sub-processes to launch (default 1)")
 
     args = parser.parse_args()
@@ -132,7 +140,8 @@ def main(args=None):
     modified_files = []
 
     if args.npp == 1:
-        worker = partial(fix_file, write=not args.dry, keepid=args.keepid, forceid=args.forceid, metadata=metadata)
+        worker = partial(fix_file, write=not args.dry, keepid=args.keepid, forceid=args.forceid, metadata=metadata,
+                         add_attributes=args.addattrs)
         for root, dirs, files in os.walk(odir):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
@@ -150,7 +159,7 @@ def main(args=None):
                         considered_files.append(os.path.join(root, filepath))
         pool = multiprocessing.Pool(processes=args.npp)
         modifications = pool.map(partial(fix_file, write=not args.dry, keepid=args.keepid, forceid=args.forceid,
-                                         metadata=metadata), considered_files)
+                                         metadata=metadata, add_attributes=args.addattrs), considered_files)
         for i in range(len(modifications)):
             if modifications[i]:
                 modified_files.append(considered_files[i])
