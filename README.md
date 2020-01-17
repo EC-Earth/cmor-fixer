@@ -24,12 +24,13 @@ Download [miniconda](https://repo.continuum.io/miniconda/) (e.g. take the latest
  bash Miniconda3-latest-Linux-x86_64.sh -b -u -p /$PERM/miniconda3  #  for instance on cca, because on $PERM the disk space is sufficient, which is on cca not the case for $HOME.
 
  ```
-One could consider to add the following aliases in the `.bashrc` file:
+One could consider to add the following variable definition and alias in the `.bashrc` file:
  ```shell
  minconda3path=${HOME}/miniconda3/                                 #  for instance on your laptop
  minconda3path=${PERM}/miniconda3/                                 #  for instance on cca
- ```
  
+ alias activateminiconda3='source ${minconda3path}/etc/profile.d/conda.sh'
+ ```
 
 ##### Download cmor-fixer by a git checkout
 
