@@ -82,7 +82,7 @@ conda env create -f environment.yml        # for linux & mac os
  conda activate cmorfixer
 
  # An example in which cmor fixer is applying the lon & lon_bnds fix to the data:
- ./cmor-fixer.py --verbose --forceid --olist --npp 1 --dry CMIP6/
+ ./cmor-fixer.py --verbose --forceid --olist --npp 1 CMIP6/
  
  conda deactivate
 ```
@@ -92,9 +92,19 @@ The `submit-cmor-fixer.sh` script is an `sbatch` template for a submit script wh
 sbatch submit-cmor-fixer.sh
 ```
 
-### Apply cmor-fixer to unpublished data
+### Apply cmor-fixer to data which has not been published before
 
-...waiting for content...
+```shell
+
+ # Activate the cmor-fixer conda environment:
+ activateminiconda3                        # The alias as defined above
+ conda activate cmorfixer
+
+ # An example in which cmor fixer is applying the lon & lon_bnds fix to the data:
+ ./cmor-fixer.py --verbose --keepid --olist --npp 1 CMIP6/
+ 
+ conda deactivate
+```
 
 ## 3. Adjust the version directory name
 
