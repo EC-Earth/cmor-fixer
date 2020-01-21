@@ -94,7 +94,7 @@ def process_file(path, flog=None, write=True, keepid=False, forceid=False, metad
     try:
         modified = fix_file(path, write, keepid, forceid, metadata, add_attributes)
         if modified:
-            if isinstance(flog, multiprocessing.Queue):
+            if type(flog) == type(multiprocessing.Queue()):
                 flog.put(path)
             elif hasattr(flog, "write"):
                 flog.write(path + '\n')
