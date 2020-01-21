@@ -117,7 +117,8 @@ def listener(q, fname):
 def main(args=None):
     if args is None:
         pass
-    parser = argparse.ArgumentParser(description="Fix longitude coordinate (and opt. attributes) in cmorized files")
+    formatter = lambda prog: argparse.HelpFormatter(prog,max_help_position=30)
+    parser = argparse.ArgumentParser(description="Fix longitude coordinate (and opt. attributes) in cmorized files", formatter_class=formatter)
     parser.add_argument("datadir", metavar="DIR", type=str, help="Directory containing cmorized files")
     parser.add_argument("--depth", "-d", type=int, help="Directory recursion depth (default: infinite)")
     parser.add_argument("--verbose", "-v", action="store_true", default=False,
