@@ -163,11 +163,11 @@ def main(args=None):
         log.error("Invalid number of subprocesses chosen, please pick a number > 0")
         return
     ofilename = "list-of-modified-files.txt"
-    if args.olist and not args.dry and os.path.isfile(ofilename):
+    if args.olist and os.path.isfile(ofilename):
         i = 1
         while os.path.isfile(ofilename):
             i += 1
-            newfilename = "list-of-modified-files_" + str(i) + ".txt"
+            newfilename = "list-of-modified-files-" + str(i) + ".txt"
             log.warning("Output file name %s already exists, trying %s..." % (ofilename, newfilename))
             ofilename = newfilename
     if args.npp == 1:
