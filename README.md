@@ -26,10 +26,10 @@ Download [miniconda](https://repo.continuum.io/miniconda/) (e.g. take the latest
  ```
 One could consider to add the following variable definition and alias in the `.bashrc` file:
  ```shell
- minconda3path=${HOME}/miniconda3/                                 #  for instance on your laptop
- minconda3path=${PERM}/miniconda3/                                 #  for instance on cca
+ miniconda3path=${HOME}/miniconda3/                                 #  for instance on your laptop
+ miniconda3path=${PERM}/miniconda3/                                 #  for instance on cca
  
- alias activateminiconda3='source ${minconda3path}/etc/profile.d/conda.sh'
+ alias activateminiconda3='source ${miniconda3path}/etc/profile.d/conda.sh'
  ```
 
 ##### Download cmor-fixer by a git checkout
