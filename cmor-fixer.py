@@ -90,10 +90,35 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
     return modified
 
 
+def process_file(path, flog=None, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
+    try:
+        modified = fix_file(path, write, keepid, forceid, metadata, add_attributes)
+        if modified:
+            if type(flog) == type(multiprocessing.Queue()):
+                flog.put(path)
+            elif hasattr(flog, "write"):
+                flog.write(path + '\n')
+    except IOError as io_err:
+        log.error("An IO error for file %s occurred: %s" % (path, io_err.message))
+    except AttributeError as att_err:
+        log.error("An attribute error for file %s occurred: %s" % (path, att_err.message))
+
+
+def listener(q, fname):
+    with open(fname, 'w') as flog:
+        while 1:
+            elem = q.get()
+            if elem == "kill":
+                break
+            flog.write(str(elem) + '\n')
+            flog.flush()
+
+
 def main(args=None):
     if args is None:
         pass
-    parser = argparse.ArgumentParser(description="Fix longitude coordinate (and opt. attributes) in cmorized files")
+    formatter = lambda prog: argparse.HelpFormatter(prog,max_help_position=30)
+    parser = argparse.ArgumentParser(description="Fix longitude coordinate (and opt. attributes) in cmorized files", formatter_class=formatter)
     parser.add_argument("datadir", metavar="DIR", type=str, help="Directory containing cmorized files")
     parser.add_argument("--depth", "-d", type=int, help="Directory recursion depth (default: infinite)")
     parser.add_argument("--verbose", "-v", action="store_true", default=False,
@@ -137,19 +162,23 @@ def main(args=None):
     if args.npp < 1:
         log.error("Invalid number of subprocesses chosen, please pick a number > 0")
         return
-    modified_files = []
-
+    ofilename = "list-of-modified-files.txt"
+    if args.olist and os.path.isfile(ofilename):
+        i = 1
+        while os.path.isfile(ofilename):
+            i += 1
+            newfilename = "list-of-modified-files-" + str(i) + ".txt"
+            log.warning("Output file name %s already exists, trying %s..." % (ofilename, newfilename))
+            ofilename = newfilename
     if args.npp == 1:
-        worker = partial(fix_file, write=not args.dry, keepid=args.keepid, forceid=args.forceid, metadata=metadata,
-                         add_attributes=args.addattrs)
+        ofile = open(ofilename, 'w') if args.olist else None
+        worker = partial(process_file, flog=ofile, write=not args.dry, keepid=args.keepid, forceid=args.forceid,
+                         metadata=metadata, add_attributes=args.addattrs)
         for root, dirs, files in os.walk(odir):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
                     if filepath.endswith(".nc"):
-                        ncfile = os.path.join(root, filepath)
-                        modified = worker(ncfile)
-                        if modified:
-                            modified_files.append(ncfile)
+                        worker(os.path.join(root, filepath))
     else:
         considered_files = []
         for root, dirs, files in os.walk(odir):
@@ -157,17 +186,21 @@ def main(args=None):
                 for filepath in files:
                     if filepath.endswith(".nc"):
                         considered_files.append(os.path.join(root, filepath))
+        manager = multiprocessing.Manager()
+        fq = manager.Queue()
         pool = multiprocessing.Pool(processes=args.npp)
-        modifications = pool.map(partial(fix_file, write=not args.dry, keepid=args.keepid, forceid=args.forceid,
-                                         metadata=metadata, add_attributes=args.addattrs), considered_files)
-        for i in range(len(modifications)):
-            if modifications[i]:
-                modified_files.append(considered_files[i])
-
-    if args.olist:
-        with open("list-of-modified-files.txt", 'w') as ofile:
-            for f in modified_files:
-                ofile.write(f + '\n')
+        watcher = pool.apply_async(listener, (fq, ofilename))
+        jobs = []
+        for f in considered_files:
+            job = pool.apply_async(process_file, (f, fq, not args.dry, args.keepid, args.forceid, metadata,
+                                                  args.addattrs))
+            jobs.append(job)
+        for job in jobs:
+            job.get()
+        # now we are done, kill the listener
+        fq.put("kill")
+        pool.close()
+        pool.join()
 
 
 if __name__ == "__main__":
