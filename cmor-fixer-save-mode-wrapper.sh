@@ -21,16 +21,16 @@ if [ "$#" -eq 2 ]; then
    number_of_cores=$1
    dir_with_cmorised_data=$2
 
-   olist_filename='list-of-modified-files.txt'
+   olist_1_filename='list-of-modified-files.txt'
    olist_2_filename='list-of-modified-files-2.txt'
    olist_3_filename='list-of-modified-files-3.txt'
    olist_4_filename='list-of-modified-files-4.txt'
    diff_olists='diff-list-of-modified-files.txt'
 
-   if [[ -e ${olist_filename} || -e ${olist_2_filename} || -e ${olist_3_filename} || -e ${olist_4_filename} || -e ${diff_olists} ]] ; then
+   if [[ -e ${olist_1_filename} || -e ${olist_2_filename} || -e ${olist_3_filename} || -e ${olist_4_filename} || -e ${diff_olists} ]] ; then
     echo
     echo ' Aborting' $0 ' because you have to rename any of the files with the names:'
-    echo ' ' ${olist_filename}
+    echo ' ' ${olist_1_filename}
     echo ' ' ${olist_2_filename}
     echo ' ' ${olist_3_filename}
     echo ' ' ${olist_4_filename}
@@ -62,22 +62,26 @@ if [ "$#" -eq 2 ]; then
    ./cmor-fixer.py --dry --verbose --olist --npp ${number_of_cores} ${dir_with_cmorised_data} &> cmor-fixer-messages-1.log
 
    # For testing the script for the non-empty olist case or the case the olists differ:
-  #echo ' Make non-empty for test only.' >> ${olist_filename}
-  #more bup-list-of-modified-files-3.txt > ${olist_filename}
+  #echo ' Make non-empty for test only.' >> ${olist_1_filename}
+  #more bup-list-of-modified-files-3.txt > ${olist_1_filename}
    
   #sleep 1
-   if [[ ! -e ${olist_filename} ]] ; then
+   if [[ ! -e ${olist_1_filename} ]] ; then
     echo
-    echo -e "\e[1;31m Error:\e[0m"' the file ' ${olist_filename} ' should have been produced.'
+    echo -e "\e[1;31m Error:\e[0m"' the file ' ${olist_1_filename} ' should have been produced.'
     echo
     exit 1
    fi
 
-   if [[ ! -s ${olist_filename} ]]; then
+   if [[ ! -s ${olist_1_filename} ]]; then
     echo
     echo ' All files in the entire dataset are correct, so ' $0 ' will not apply any changes.'
     echo
     exit 1
+   else
+    echo
+    echo ' There are files the dataset which are incorrect, so ' $0 ' will continue to apply the fix for these files.'
+    echo
    fi
 
    # Create, before really applying the changes, the olist for the --forceid case:
@@ -93,8 +97,15 @@ if [ "$#" -eq 2 ]; then
    # Apply the changes the olist for the --forceid case:
    ./cmor-fixer.py --verbose --forceid --olist --npp ${number_of_cores} ${dir_with_cmorised_data} &> cmor-fixer-messages-3.log
 
+   if [[ ! -e ${olist_3_filename} ]] ; then
+    echo
+    echo -e "\e[1;31m Error:\e[0m"' the file ' ${olist_3_filename} ' should have been produced.'
+    echo
+    exit 1
+   fi
 
-   diff ${olist_2_filename} ${olist_filename} >> ${diff_olists}
+
+   diff ${olist_3_filename} ${olist_2_filename} > ${diff_olists}
 
    if [[ ! -s ${diff_olists} ]]; then
     echo
