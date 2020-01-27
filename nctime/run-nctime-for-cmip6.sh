@@ -22,7 +22,6 @@ if [ "$#" -eq 1 ]; then
  fi
 
  # Install nctcck which is part of nctime with pip:
- pip install cython
  pip install nctime --upgrade
 
  # Checking with the nctime command nctcck the conitinuity of the produced time records:
