@@ -57,21 +57,11 @@ if [ "$#" -eq 2 ]; then
     exit 1
    fi
 
-#  # First move list-of-modified-files.txt if they exists already:
-#  olist_filename='list-of-modified-files'
-#  if [[ -e ${olist_filename}.txt ]] ; then
-#      i=1
-#      while [[ -e ${olist_filename}-backup-$i.txt ]] ; do
-#          let i++
-#      done
-#      olist_filename=${olist_filename}-backup-$i.txt
-#  fi
-
 
    # First run cmor-fixer in the save dry-run mode in order to figure out if there is any file with an error at all:
    ./cmor-fixer.py --dry --verbose --olist --npp ${number_of_cores} ${dir_with_cmorised_data} &> cmor-fixer-messages-1.log
 
-   # For testing the script with non-empty case:
+   # For testing the script for the non-empty olist case or the case the olists differ:
   #echo ' Make non-empty for test only.' >> ${olist_filename}
   #more bup-list-of-modified-files-3.txt > ${olist_filename}
    
