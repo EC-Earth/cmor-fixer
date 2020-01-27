@@ -1,7 +1,7 @@
 # For developers only:
 #  Remove the cmorfixer environment and clean the downloaded conda cache:
 #   conda deactivate
-#   conda-env remove -y -n cmorfixer
+#   conda env remove -y -n cmorfixer
 #   conda clean --all -y
 #  Create the cmorfixer environment:
 #   conda update -n base -c defaults conda        # For updating conda itself if you like
@@ -9,7 +9,7 @@
 #  Basic tests:
 #   ./cmor-fixer.py -h
 #  Miscelaneous relevant help commands:
-#   conda-env list
+#   conda env list
 #   conda list
 #   conda update --all
 
