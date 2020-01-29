@@ -73,7 +73,7 @@ conda env create -f environment.yml        # for linux & mac os
 ### Apply cmor-fixer at the ESGF node to data which has been published at the ESGF node
 
 
-##### Running the cmor-fixer inside the conda environment:
+##### Option 1: Running the cmor-fixer inside the conda environment:
 
 ```shell
 
@@ -87,7 +87,22 @@ conda env create -f environment.yml        # for linux & mac os
  conda deactivate
 ```
 
-The `submit-cmor-fixer.sh` script is an `sbatch` template for a submit script which needs adjustments of all the paths and possibly adjustent of the cmor-fixer arguments depending on the preferences of the user. The script can be called by:
+##### Option 2: Alternatively, use the `cmor-fixer-save-mode-wrapper.sh` script:
+
+The `cmor-fixer-save-mode-wrapper.sh` script will only apply changes if at least one file with one error is detected in the entire dataset. In case an error is detected and the script will continue to apply changes, additional checks will be applied to check for interuptions during running the script.
+```
+ # Activate the cmor-fixer conda environment:
+ activateminiconda3                        # The alias as defined above
+ conda activate cmorfixer
+ 
+ ./cmor-fixer-save-mode-wrapper.sh 1 CMIP6/
+ 
+ conda deactivate
+```
+
+##### Option 3: Use a submit script:
+
+The `submit-cmor-fixer.sh` script is an `sbatch` template for a submit script which needs adjustments of all the paths and possibly adjustent of the cmor-fixer arguments depending on the preferences of the user. The script can be called (it activates the cmor environment itself at the compute node) by:
 ```shell
 sbatch submit-cmor-fixer.sh
 ```
@@ -122,3 +137,71 @@ If so (this happens when during running the script the date changed because you 
 ```shell
 ./versions.sh -v v20200120 -m CMIP6/
 ```
+
+## 4. Some basic validation checks
+
+#### Run the script which counts the number of files per year in your dataset:
+```
+./files-per-year.sh 1850 2014 CMIP6
+```
+#### Run `nctime` which checks whether the metadata doesn't show time gaps (due to glitches):
+```
+conda deactivate                     # Leaving the cmorfixer environment due to trouble with installing nctime
+activateminiconda3                   # Only needed when not done before (doesn't harm to do it twice)
+cd nctime/
+./run-nctime-for-cmip6.sh CMIP6      # This will install nctime directly in the miniconda3 environment en run it
+```
+
+## 5. Check the longitude-shift fix itself
+
+With 
+```
+ncdump -v lon some-cmorised-file.nc
+ncdump -v lon_bnds some-cmorised-file.nc
+```
+one can easily see the `lon` & `lon_bnds` values.
+
+#### The longitude values
+
+Incorrect `lon` values start at `0.3515625` like: 
+```
+lon = 0.3515625, 1.0546875, 1.7578125, 2.4609375, 3.1640625, 3.8671875, 
+```
+while correct `lon` values start at `0` like:
+```
+lon = 0, 0.703125, 1.40625, 2.109375, 2.8125, 3.515625, 4.21875, 4.921875, 
+```
+
+#### The longitude boundaries values
+
+Incorrect `lon_bnds` values start at `0, 0.703125` like: 
+```
+ lon_bnds =
+  0, 0.703125,
+  0.703125, 1.40625,
+  1.40625, 2.109375,
+  2.109375, 2.8125,
+  2.8125, 3.515625,
+  3.515625, 4.21875,
+  4.21875, 4.921875,
+  4.921875, 5.625,
+  5.625, 6.328125,
+```
+while correct `lon_bnds` values start at `-0.3515625, 0.3515625` like:
+```
+ lon_bnds =
+  -0.3515625, 0.3515625,
+  0.3515625, 1.0546875,
+  1.0546875, 1.7578125,
+  1.7578125, 2.4609375,
+  2.4609375, 3.1640625,
+  3.1640625, 3.8671875,
+  3.8671875, 4.5703125,
+  4.5703125, 5.2734375,
+  5.2734375, 5.9765625,
+  5.9765625, 6.6796875,
+```
+
+#### Comparing a the pre & post fixed file
+
+Because the error and the fix are in the coordinate values itself, diffing the files well is slightly complicated. The best way to inspect the changes in a file after fixing is to make a `ncdump` of the file before fixing and a `ncdump` of the file after fixing and use `meld` to compare them (it takes a while before meld manages to load). You will then see that the `lon` and/or `lon_bnds` values are shifted half a gird cell westwards (lower),that the `tracking_id`is changed and that a message is added to the history telling cmor-fixer has modified the file.
