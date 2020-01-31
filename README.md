@@ -1,7 +1,11 @@
 # cmor-fixer
 On-site fixer script for cmorized data
 
-Python code to fix the incorrect longitude eastward shift of half a grid cell by ece2cmor, see [ece2cmor issue 553](https://github.com/EC-Earth/ece2cmor3/issues/553).
+Python code to fix the incorrect longitude eastward shift of half a grid cell by `ece2cmor`, see [ece2cmor issue 553](https://github.com/EC-Earth/ece2cmor3/issues/553).
+
+The procedure to use the `cmor-fixer` is described at the EC-Earth portal wiki page [Correct cmorised data with the cmor-fixer](https://dev.ec-earth.org/projects/cmip6/wiki/Correct-cmorised-data-with-the-cmor-fixer). That wiki page referes for some description to this README. A pdf print of this page is uploaded in this repository and can be found [here](https://github.com/EC-Earth/cmor-fixer/blob/master/documentation/procedure-description-how-to-correct-cmorised-data-with-the-cmor-fixer.pdf).
+
+Issue [731](https://dev.ec-earth.org/issues/731) at the EC-Earth portal is dedicated to this subject.
 
 ## Required python packages:
 
