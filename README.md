@@ -202,6 +202,6 @@ while correct `lon_bnds` values start at `-0.3515625, 0.3515625` like:
   5.9765625, 6.6796875,
 ```
 
-#### Comparing a the pre & post fixed file
+#### Comparing the pre & post fixed file
 
-Because the error and the fix are in the coordinate values itself, diffing the files well is slightly complicated. The best way to inspect the changes in a file after fixing is to make a `ncdump` of the file before fixing and a `ncdump` of the file after fixing and use `meld` to compare them (it takes a while before meld manages to load). You will then see that the `lon` and/or `lon_bnds` values are shifted half a gird cell westwards (lower),that the `tracking_id`is changed and that a message is added to the history telling cmor-fixer has modified the file.
+Because the error and the fix are in the coordinate values itself, diffing the files well is slightly complicated. The best way to inspect the changes in a file after fixing is to make a `ncdump` of the file before fixing and a `ncdump` of the file after fixing and thereafter use `meld` to compare them (it takes a while before meld manages to load). You will then see that the `lon` and/or `lon_bnds` values are shifted half a gird cell westwards (lower), that the `tracking_id`is changed and that a message is added to the netcdf history attribute telling that @cmor-fixer@ has modified the file.
