@@ -178,6 +178,9 @@ def main(args=None):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
                     if filepath.endswith(".nc"):
+                        candidatefile = os.path.join(root,filepath)
+                        if os.path.islink(candidatefile):
+                            continue
                         worker(os.path.join(root, filepath))
     else:
         considered_files = []
@@ -185,6 +188,9 @@ def main(args=None):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
                     if filepath.endswith(".nc"):
+                        candidatefile = os.path.join(root,filepath)
+                        if os.path.islink(candidatefile):
+                            continue
                         considered_files.append(os.path.join(root, filepath))
         manager = multiprocessing.Manager()
         fq = manager.Queue()
