@@ -174,18 +174,20 @@ def main(args=None):
         ofile = open(ofilename, 'w') if args.olist else None
         worker = partial(process_file, flog=ofile, write=not args.dry, keepid=args.keepid, forceid=args.forceid,
                          metadata=metadata, add_attributes=args.addattrs)
-        for root, dirs, files in os.walk(odir):
+        for root, dirs, files in os.walk(odir, followlinks=False):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
-                    if filepath.endswith(".nc"):
-                        worker(os.path.join(root, filepath))
+                    fullpath = os.path.join(root, filepath)
+                    if not os.path.islink(fullpath) and filepath.endswith(".nc"):
+                        worker(fullpath)
     else:
         considered_files = []
-        for root, dirs, files in os.walk(odir):
+        for root, dirs, files in os.walk(odir, followlinks=False):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
-                    if filepath.endswith(".nc"):
-                        considered_files.append(os.path.join(root, filepath))
+                    fullpath = os.path.join(root, filepath)
+                    if not os.path.islink(fullpath) and filepath.endswith(".nc"):
+                        considered_files.append(fullpath)
         manager = multiprocessing.Manager()
         fq = manager.Queue()
         pool = multiprocessing.Pool(processes=args.npp)
