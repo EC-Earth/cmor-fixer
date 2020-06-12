@@ -6,6 +6,7 @@ import json
 import netCDF4
 import logging
 import uuid
+import numpy as np
 import multiprocessing
 from functools import partial
 
@@ -60,6 +61,21 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
                             ds.variables[bndvarname][...] -= shift
                         modified = True
                         shifted_vars.add(bndvarname)
+
+    # Correcting evspsbl: convert from fraction to percentage. See EC-Earth portal issue 768-13:
+    # https://dev.ec-earth.org/issues/768#note-13
+    for key in ds.variables:
+    #if key == "evspsbl" and getattr(ds, "grid_label") == "gr":
+     if key == "evspsbl":
+      # Check the ratio of total positive and negative field values: if the number of positive field values
+      # is smaller than the number of negative values, then the sign will be flipped:
+     #print('ratio = ', np.count_nonzero(ds.variables[key][...] > 0) / np.count_nonzero(ds.variables[key][...] < 0))
+      if np.count_nonzero(ds.variables[key][...] > 0) < np.count_nonzero(ds.variables[key][...] < 0):
+       log.info('Flip the sign of the entire field by multiplying by a factor -1 for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+       if write:
+        ds.variables[key][...] = -1.0 * ds.variables[key][...] # Flip the sign of the field values
+        modified = True
+
     if metadata is not None:
         for key, val in metadata.items():
             attname, attval = str(key), val
