@@ -12,7 +12,7 @@ from functools import partial
 
 # import datetime
 
-version = 'v2.1'
+version = 'v2.2'
 
 log = logging.getLogger(os.path.basename(__file__))
 
