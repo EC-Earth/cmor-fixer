@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys                                                    # for sys.exit
 import argparse
 import os
 import json
@@ -10,13 +11,26 @@ import numpy as np
 import multiprocessing
 from functools import partial
 
+error_message   = '\n \033[91m' + 'Error:'   + '\033[0m'      # Red    error   message
+warning_message = '\n \033[93m' + 'Warning:' + '\033[0m'      # Yellow warning message
+
 # import datetime
 
-version = 'v2.2'
+version = 'v2.3'
 
 log = logging.getLogger(os.path.basename(__file__))
 
 skipped_attributes = ["source", "comment"]
+
+# Loading once at the start the NEMO longitude and latitude vertices from a netcdf file:
+nemo_vertices_file_name="lon-vertices/nemo-vertices-t-grid.nc"
+if os.path.isfile(nemo_vertices_file_name) == False: print(error_message, ' The netcdf data file ', nemo_vertices_file_name, '  does not exist.\n'); sys.exit()
+nemo_vertices_netcdf_file = netCDF4.Dataset(nemo_vertices_file_name, 'r')
+lon_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_longitude"]
+lat_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_latitude"]
+lon_vertices_from_nemo = np.array(lon_vertices_from_nemo_tmp[...], copy=True)
+lat_vertices_from_nemo = np.array(lat_vertices_from_nemo_tmp[...], copy=True)
+nemo_vertices_netcdf_file.close()
 
 
 def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
@@ -87,6 +101,20 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
        log.info('Flip the sign of the entire field by multiplying by a factor -1 for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
        if write:
         ds.variables[key][...] = -1.0 * ds.variables[key][...] # Flip the sign of the field values
+        modified = True
+
+    # Correcting vertices_longitude and vertices_latitude. See ece2cmor3 issue 625:
+    # https://github.com/EC-Earth/ece2cmor3/issues/625
+    for key in ds.variables:
+     if key == "vertices_longitude" and getattr(ds, "grid_label") == "gn":
+      # In the files which have the dateline BUG in the longitude vertices a few values are above 300 degrees
+      # while in the correct data all values are between -180 and +180. Thus detecting the the BUG is just a
+      # check: if any point exceeds 300 then the vertices have to be replaced.
+      if (ds.variables[key][...] > 300.0).any():
+       log.info('Replacing the longitude and latitude vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+       if write:
+        ds.variables[key][...]                 = lon_vertices_from_nemo[...] # Replacing the longitude vertices
+        ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo[...] # Replacing the latitude  vertices
         modified = True
 
     if metadata is not None:
