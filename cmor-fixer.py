@@ -23,7 +23,7 @@ log = logging.getLogger(os.path.basename(__file__))
 skipped_attributes = ["source", "comment"]
 
 # Loading once at the start the NEMO longitude and latitude vertices from a netcdf file:
-nemo_vertices_file_name="lon-vertices/nemo-vertices-t-grid.nc"
+nemo_vertices_file_name="nemo-vertices/nemo-vertices-t-grid.nc"
 if os.path.isfile(nemo_vertices_file_name) == False: print(error_message, ' The netcdf data file ', nemo_vertices_file_name, '  does not exist.\n'); sys.exit()
 nemo_vertices_netcdf_file = netCDF4.Dataset(nemo_vertices_file_name, 'r')
 lon_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_longitude"]
