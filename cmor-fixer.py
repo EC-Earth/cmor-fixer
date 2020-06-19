@@ -40,6 +40,7 @@ def load_vertices(vertices_file_name):
 lon_vertices_from_nemo_orca1_t_grid, lat_vertices_from_nemo_orca1_t_grid = load_vertices("nemo-vertices-ORCA1-t-grid.nc")
 lon_vertices_from_nemo_orca1_u_grid, lat_vertices_from_nemo_orca1_u_grid = load_vertices("nemo-vertices-ORCA1-u-grid.nc")
 lon_vertices_from_nemo_orca1_v_grid, lat_vertices_from_nemo_orca1_v_grid = load_vertices("nemo-vertices-ORCA1-v-grid.nc")
+orca1_grid_shape = (292, 362, 4)
 
 def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
     ds = netCDF4.Dataset(path, "r+" if write else "r")
@@ -119,6 +120,9 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
       # while in the correct data all values are between -180 and +180. Thus detecting the the BUG is just a
       # check: if any point exceeds 300 then the vertices have to be replaced.
       if (ds.variables[key][...] > 300.0).any():
+       if lon_vertices_from_nemo_orca1_t_grid[...].shape != orca1_grid_shape:
+        print(warning_message, 'Incorrect vertices have been detected, however cmor-fixer currently only supports a fix for the ORCA1 grid. Here different grid sizes are detected: ', lon_vertices_from_nemo_orca1_t_grid[...].shape, '\n')
+        break
        log.info('Replacing the longitude and latitude vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
        if write:
         ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_t_grid[...] # Replacing the longitude vertices
