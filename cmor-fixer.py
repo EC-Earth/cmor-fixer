@@ -22,16 +22,24 @@ log = logging.getLogger(os.path.basename(__file__))
 
 skipped_attributes = ["source", "comment"]
 
-# Loading once at the start the NEMO longitude and latitude vertices from a netcdf file:
-nemo_vertices_file_name=os.path.join("nemo-vertices", "nemo-vertices-ORCA1-t-grid.nc")
-if os.path.isfile(nemo_vertices_file_name) == False: print(error_message, ' The netcdf data file ', nemo_vertices_file_name, '  does not exist.\n'); sys.exit()
-nemo_vertices_netcdf_file = netCDF4.Dataset(nemo_vertices_file_name, 'r')
-lon_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_longitude"]
-lat_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_latitude"]
-lon_vertices_from_nemo = np.array(lon_vertices_from_nemo_tmp[...], copy=True)
-lat_vertices_from_nemo = np.array(lat_vertices_from_nemo_tmp[...], copy=True)
-nemo_vertices_netcdf_file.close()
 
+def load_vertices(vertices_file_name):
+    # Call example of function: lon_vertices_from_nemo_orca1_t_grid, lat_vertices_from_nemo_orca1_t_grid = load_vertices("nemo-vertices-ORCA1-t-grid.nc")
+    # Loading once at the start the NEMO longitude and latitude vertices from a netcdf file:
+    nemo_vertices_file_name=os.path.join("nemo-vertices", vertices_file_name)
+    if os.path.isfile(nemo_vertices_file_name) == False: print(error_message, ' The netcdf data file ', nemo_vertices_file_name, '  does not exist.\n'); sys.exit()
+    nemo_vertices_netcdf_file = netCDF4.Dataset(nemo_vertices_file_name, 'r')
+    lon_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_longitude"]
+    lat_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_latitude"]
+    lon_vertices_from_nemo = np.array(lon_vertices_from_nemo_tmp[...], copy=True)
+    lat_vertices_from_nemo = np.array(lat_vertices_from_nemo_tmp[...], copy=True)
+    nemo_vertices_netcdf_file.close()
+    return lon_vertices_from_nemo, lat_vertices_from_nemo
+
+# Load the vertices fields (Note these are global variables which otherwise have to be given as arguments via the function process_file to the function fix_file):
+lon_vertices_from_nemo_orca1_t_grid, lat_vertices_from_nemo_orca1_t_grid = load_vertices("nemo-vertices-ORCA1-t-grid.nc")
+lon_vertices_from_nemo_orca1_u_grid, lat_vertices_from_nemo_orca1_u_grid = load_vertices("nemo-vertices-ORCA1-u-grid.nc")
+lon_vertices_from_nemo_orca1_v_grid, lat_vertices_from_nemo_orca1_v_grid = load_vertices("nemo-vertices-ORCA1-v-grid.nc")
 
 def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
     ds = netCDF4.Dataset(path, "r+" if write else "r")
@@ -113,8 +121,8 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
       if (ds.variables[key][...] > 300.0).any():
        log.info('Replacing the longitude and latitude vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
        if write:
-        ds.variables[key][...]                 = lon_vertices_from_nemo[...] # Replacing the longitude vertices
-        ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo[...] # Replacing the latitude  vertices
+        ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_t_grid[...] # Replacing the longitude vertices
+        ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_t_grid[...] # Replacing the latitude  vertices
         modified = True
 
     if metadata is not None:
