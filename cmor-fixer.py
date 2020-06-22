@@ -37,6 +37,18 @@ def load_vertices(vertices_file_name):
     nemo_vertices_netcdf_file.close()
     return lon_vertices_from_nemo, lat_vertices_from_nemo
 
+def load_lon_lat(lon_lat_file_name):
+    # Loading once at the start the cmorised longitudes and latitudes from a netcdf file:
+    cmorised_lon_lat_file_name=os.path.join("lon-vertices", lon_lat_file_name)
+    if os.path.isfile(cmorised_lon_lat_file_name) == False: print(error_message, ' The netcdf data file ', cmorised_lon_lat_file_name, '  does not exist.\n'); sys.exit()
+    cmorised_lon_lat_netcdf_file = netCDF4.Dataset(cmorised_lon_lat_file_name, 'r')
+    lon_from_nemo_tmp = cmorised_lon_lat_netcdf_file.variables["longitude"]
+    lat_from_nemo_tmp = cmorised_lon_lat_netcdf_file.variables["latitude"]
+    lon_from_nemo = np.array(lon_from_nemo_tmp[...], copy=True)
+    lat_from_nemo = np.array(lat_from_nemo_tmp[...], copy=True)
+    cmorised_lon_lat_netcdf_file.close()
+    return lon_from_nemo, lat_from_nemo
+
 # Load the vertices fields (Note these are global variables which otherwise have to be given as arguments via the function process_file to the function fix_file):
 lon_vertices_from_nemo_orca1_t_grid, lat_vertices_from_nemo_orca1_t_grid = load_vertices("nemo-vertices-ORCA1-t-grid.nc")
 lon_vertices_from_nemo_orca1_u_grid, lat_vertices_from_nemo_orca1_u_grid = load_vertices("nemo-vertices-ORCA1-u-grid.nc")
@@ -47,12 +59,22 @@ orca1_grid_shape = (292, 362, 4)
 #  lon_vertices_from_cmorised_orca1_t_grid, lat_vertices_from_cmorised_orca1_t_grid = load_vertices("cmorised-vertices-ORCA1-t-grid.nc")
 #  lon_vertices_from_cmorised_orca1_u_grid, lat_vertices_from_cmorised_orca1_u_grid = load_vertices("cmorised-vertices-ORCA1-u-grid.nc")
 #  lon_vertices_from_cmorised_orca1_v_grid, lat_vertices_from_cmorised_orca1_v_grid = load_vertices("cmorised-vertices-ORCA1-v-grid.nc")
-#  print(lon_vertices_from_cmorised_orca1_t_grid[290,105,1]) # 250.39437866210938
-#  print(lon_vertices_from_cmorised_orca1_u_grid[290,105,1]) # 250.52598571777344
-#  print(lon_vertices_from_cmorised_orca1_v_grid[290,105,1]) # 253.0
-#  print(lon_vertices_from_nemo_orca1_t_grid[290,105,1])     # -112.211136 + 180.0
-#  print(lon_vertices_from_nemo_orca1_u_grid[290,105,1])     # -111.950270 + 180.0
-#  print(lon_vertices_from_nemo_orca1_v_grid[290,105,1])     # -109.598724 + 180.0
+#  print(lon_vertices_from_cmorised_orca1_t_grid[290,105,1])     # 250.39437866210938
+#  print(lon_vertices_from_cmorised_orca1_u_grid[290,105,1])     # 250.52598571777344
+#  print(lon_vertices_from_cmorised_orca1_v_grid[290,105,1])     # 253.0
+#  print(lon_vertices_from_nemo_orca1_t_grid[290,105,1] + 180.0) # -112.211136 + 180.0 = 67.78886413574219
+#  print(lon_vertices_from_nemo_orca1_u_grid[290,105,1] + 180.0) # -111.950270 + 180.0 = 68.04972839355469
+#  print(lon_vertices_from_nemo_orca1_v_grid[290,105,1] + 180.0) # -109.598724 + 180.0 = 70.40127563476562
+#  sys.exit()
+
+# Load the longitude and latitude fields for testing whether they lie between teir corresponding vertices. This
+# test is only switced on in the cmor-fixer development phase):
+#  lon_from_cmorised_orca1_t_grid, lat_from_cmorised_orca1_t_grid = load_lon_lat("hfds-t-grid-cmorised.nc")
+#  lon_from_cmorised_orca1_u_grid, lat_from_cmorised_orca1_u_grid = load_lon_lat("uo-u-grid-cmorised.nc")
+#  lon_from_cmorised_orca1_v_grid, lat_from_cmorised_orca1_v_grid = load_lon_lat("vo-v-grid-cmorised.nc")
+#  print(' (lon, lat) at t-grid = ', lon_from_cmorised_orca1_t_grid[290,105], lat_from_cmorised_orca1_t_grid[290,105]) # 250.2568359375     85.9527359008789
+#  print(' (lon, lat) at u-grid = ', lon_from_cmorised_orca1_u_grid[290,105], lat_from_cmorised_orca1_u_grid[290,105]) # 250.40127563476562 85.74063873291016
+#  print(' (lon, lat) at v-grid = ', lon_from_cmorised_orca1_v_grid[290,105], lat_from_cmorised_orca1_v_grid[290,105]) # 253.0              85.9576187133789
 #  sys.exit()
 
 def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
@@ -127,8 +149,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
 
     # Correcting vertices_longitude and vertices_latitude. See ece2cmor3 issue 625:
     # https://github.com/EC-Earth/ece2cmor3/issues/625
-    # To do:
-    #  Check if lons are inbetween its vertices, same for lats.
+    # To do: Check if lons are inbetween its vertices, same for lats.
     for key in ds.variables:
      if key == "vertices_longitude" and getattr(ds, "grid_label") == "gn":
       # In order to detect whether the cmorised file contains the vertices which are not directly based on the NEMO
