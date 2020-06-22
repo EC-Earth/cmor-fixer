@@ -42,7 +42,7 @@ lon_vertices_from_nemo_orca1_t_grid, lat_vertices_from_nemo_orca1_t_grid = load_
 lon_vertices_from_nemo_orca1_u_grid, lat_vertices_from_nemo_orca1_u_grid = load_vertices("nemo-vertices-ORCA1-u-grid.nc")
 lon_vertices_from_nemo_orca1_v_grid, lat_vertices_from_nemo_orca1_v_grid = load_vertices("nemo-vertices-ORCA1-v-grid.nc")
 orca1_grid_shape = (292, 362, 4)
-# Determine a distinguising point with which help we can distinguish the t, u and v grid:
+# Determine a distinguising point with which help we can distinguish the t, u and v grid (Needed for the vertices correction):
 # Load the vertices fields (Note these are global variables which otherwise have to be given as arguments via the function process_file to the function fix_file):
 #  lon_vertices_from_cmorised_orca1_t_grid, lat_vertices_from_cmorised_orca1_t_grid = load_vertices("cmorised-vertices-ORCA1-t-grid.nc")
 #  lon_vertices_from_cmorised_orca1_u_grid, lat_vertices_from_cmorised_orca1_u_grid = load_vertices("cmorised-vertices-ORCA1-u-grid.nc")
@@ -132,11 +132,13 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
     for key in ds.variables:
      if key == "vertices_longitude" and getattr(ds, "grid_label") == "gn":
       # In order to detect whether the cmorised file contains the vertices which are not directly based on the NEMO
-      # data (and thus have the dateline BUG in the longitude vertices), a single point [290,105,1] is checked. This
-      # point has always different values for each t, u and v-grid after replacing them by the NEMO based ones:
+      # data (and thus have the dateline BUG in the longitude vertices), the values of a single point [290,105,1] is
+      # checked in the vertices_longitude field. This point has always different values for each t, u and v-grid
+      # after replacing them by the NEMO based ones:
       # Check on t-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 250.39437866210938 then it concerns the incorrect data.
       # Check on u-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 250.52598571777344 then it concerns the incorrect data.
       # Check on v-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 253.0              then it concerns the incorrect data.
+      # Note that based on this detection of the vertices_longitude also the vertices_latitude are changed.
       if (math.isclose(ds.variables[key][290,105,1], 250.39437866210938, rel_tol=1e-5) or \
           math.isclose(ds.variables[key][290,105,1], 250.52598571777344, rel_tol=1e-5) or \
           math.isclose(ds.variables[key][290,105,1], 253.0             , rel_tol=1e-5)):
