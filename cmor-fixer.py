@@ -53,6 +53,11 @@ def load_lon_lat(lon_lat_file_name):
 lon_vertices_from_nemo_orca1_t_grid, lat_vertices_from_nemo_orca1_t_grid = load_vertices("nemo-vertices-ORCA1-t-grid.nc")
 lon_vertices_from_nemo_orca1_u_grid, lat_vertices_from_nemo_orca1_u_grid = load_vertices("nemo-vertices-ORCA1-u-grid.nc")
 lon_vertices_from_nemo_orca1_v_grid, lat_vertices_from_nemo_orca1_v_grid = load_vertices("nemo-vertices-ORCA1-v-grid.nc")
+# Convert the vertices_longitude to the 0-360 degree interval:
+lon_vertices_from_nemo_orca1_t_grid = np.where(lon_vertices_from_nemo_orca1_t_grid < 0, lon_vertices_from_nemo_orca1_t_grid + 360.0, lon_vertices_from_nemo_orca1_t_grid)
+lon_vertices_from_nemo_orca1_u_grid = np.where(lon_vertices_from_nemo_orca1_u_grid < 0, lon_vertices_from_nemo_orca1_u_grid + 360.0, lon_vertices_from_nemo_orca1_u_grid)
+lon_vertices_from_nemo_orca1_v_grid = np.where(lon_vertices_from_nemo_orca1_v_grid < 0, lon_vertices_from_nemo_orca1_v_grid + 360.0, lon_vertices_from_nemo_orca1_v_grid)
+
 orca1_grid_shape = (292, 362, 4)
 # Determine a distinguising point with which help we can distinguish the t, u and v grid (Needed for the vertices correction):
 # Load the vertices fields (Note these are global variables which otherwise have to be given as arguments via the function process_file to the function fix_file):
@@ -62,10 +67,9 @@ orca1_grid_shape = (292, 362, 4)
 #  print(lon_vertices_from_cmorised_orca1_t_grid[290,105,1])     # 250.39437866210938
 #  print(lon_vertices_from_cmorised_orca1_u_grid[290,105,1])     # 250.52598571777344
 #  print(lon_vertices_from_cmorised_orca1_v_grid[290,105,1])     # 253.0
-#  print(lon_vertices_from_nemo_orca1_t_grid[290,105,1] + 180.0) # -112.211136 + 180.0 = 67.78886413574219
-#  print(lon_vertices_from_nemo_orca1_u_grid[290,105,1] + 180.0) # -111.950270 + 180.0 = 68.04972839355469
-#  print(lon_vertices_from_nemo_orca1_v_grid[290,105,1] + 180.0) # -109.598724 + 180.0 = 70.40127563476562
-#  sys.exit()
+#  print(lon_vertices_from_nemo_orca1_t_grid[290,105,1])         # 250.2568359375     85.9527359008789
+#  print(lon_vertices_from_nemo_orca1_u_grid[290,105,1])         # 250.40127563476562 85.74063873291016
+#  print(lon_vertices_from_nemo_orca1_v_grid[290,105,1])         # 253.0              85.9576187133789
 
 # Load the longitude and latitude fields for testing whether they lie between teir corresponding vertices. This
 # test is only switced on in the cmor-fixer development phase):
@@ -169,22 +173,22 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
        if   math.isclose(ds.variables[key][290,105,1], 250.39437866210938, rel_tol=1e-5):
         log.info('Replacing the longitude and latitude t-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
         if write:
-         ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_t_grid[...] + 180.0 # Replacing the longitude vertices and convert to the 0-360 degree interval by adding +180 degrees
-         ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_t_grid[...]         # Replacing the latitude  vertices
+         ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_t_grid[...]  # Replacing the longitude vertices
+         ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_t_grid[...]  # Replacing the latitude  vertices
          modified = True
        elif math.isclose(ds.variables[key][290,105,1], 250.52598571777344, rel_tol=1e-5):
         log.info('Replacing the longitude and latitude u-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
        #print(warning_message, 'u', ds.variables[key][290,105,1], ' should be 250.52598571777344')
         if write:
-         ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_u_grid[...] + 180.0 # Replacing the longitude vertices and convert to the 0-360 degree interval by adding +180 degrees
-         ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_u_grid[...]         # Replacing the latitude  vertices
+         ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_u_grid[...]  # Replacing the longitude vertices
+         ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_u_grid[...]  # Replacing the latitude  vertices
          modified = True
        elif math.isclose(ds.variables[key][290,105,1], 253.0, rel_tol=1e-5):
         log.info('Replacing the longitude and latitude v-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
        #print(warning_message, 'v', ds.variables[key][290,105,1], ' should be 253.0')
         if write:
-         ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_v_grid[...] + 180.0 # Replacing the longitude vertices and convert to the 0-360 degree interval by adding +180 degrees
-         ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_v_grid[...]         # Replacing the latitude  vertices
+         ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_v_grid[...]  # Replacing the longitude vertices
+         ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_v_grid[...]  # Replacing the latitude  vertices
          modified = True
        else:
         print(error_message, ' The cmor-fixer failed to determine the staggered grid in the procedure to fix the NEMO vertices. \n'); sys.exit()
