@@ -21,9 +21,9 @@ if [ "$#" -eq 0 ]; then
     orca_grid=ORCA1
    #orca_grid=ORCA025
 
-    rm -rf ../nemo-vertices/compare-vertices
-    mkdir -p ../nemo-vertices/compare-vertices
-    cd ../nemo-vertices/compare-vertices
+    rm -rf ../nemo-vertices/compare-vertices-${orca_grid}
+    mkdir -p ../nemo-vertices/compare-vertices-${orca_grid}
+    cd ../nemo-vertices/compare-vertices-${orca_grid}
 
     nemo_raw_output_t_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_T_2D.nc
     nemo_raw_output_u_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_U_3D.nc
@@ -145,12 +145,12 @@ if [ "$#" -eq 0 ]; then
 
    # Create three links for cmor-fixer tests:
    cd ../
-   if [ ! -f incorrect-cmorised-vertices-${orca_grid}-t-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-${orca_grid}-t-grid.nc incorrect-cmorised-vertices-${orca_grid}-t-grid.nc; fi
-   if [ ! -f incorrect-cmorised-vertices-${orca_grid}-u-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-${orca_grid}-u-grid.nc incorrect-cmorised-vertices-${orca_grid}-u-grid.nc; fi
-   if [ ! -f incorrect-cmorised-vertices-${orca_grid}-v-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-${orca_grid}-v-grid.nc incorrect-cmorised-vertices-${orca_grid}-v-grid.nc; fi
+   if [ ! -f incorrect-cmorised-vertices-${orca_grid}-t-grid.nc ]; then ln -s compare-vertices-${orca_grid}/incorrect-cmorised-vertices-${orca_grid}-t-grid.nc incorrect-cmorised-vertices-${orca_grid}-t-grid.nc; fi
+   if [ ! -f incorrect-cmorised-vertices-${orca_grid}-u-grid.nc ]; then ln -s compare-vertices-${orca_grid}/incorrect-cmorised-vertices-${orca_grid}-u-grid.nc incorrect-cmorised-vertices-${orca_grid}-u-grid.nc; fi
+   if [ ! -f incorrect-cmorised-vertices-${orca_grid}-v-grid.nc ]; then ln -s compare-vertices-${orca_grid}/incorrect-cmorised-vertices-${orca_grid}-v-grid.nc incorrect-cmorised-vertices-${orca_grid}-v-grid.nc; fi
 
    echo
-   echo ' The script' $0 'has finished. The produced files can be found in the directory: ../nemo-vertices/compare-vertices'
+   echo ' The script' $0 'has finished. The produced files can be found in the directory: ../nemo-vertices/compare-vertices'-${orca_grid}
    echo
 
 else
