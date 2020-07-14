@@ -18,6 +18,9 @@
 
 if [ "$#" -eq 0 ]; then
 
+    orca_grid=ORCA1
+   #orca_grid=ORCA025
+
     rm -rf ../nemo-vertices/compare-vertices
     mkdir -p ../nemo-vertices/compare-vertices
     cd ../nemo-vertices/compare-vertices
@@ -38,68 +41,68 @@ if [ "$#" -eq 0 ]; then
 
 
     # t_grid as from NEMO directly:
-    ncks -O -v hfds               ${nemo_raw_output_t_grid_file} -o hfds-ORCA1-t-grid-nemo.nc
-    ncks -O -v bounds_nav_lon     ${nemo_raw_output_t_grid_file} -o bounds-nav-lon-ORCA1-t-grid-nemo.nc
-    ncks -O -v bounds_nav_lat     ${nemo_raw_output_t_grid_file} -o bounds-nav-lat-ORCA1-t-grid-nemo.nc
+    ncks -O -v hfds               ${nemo_raw_output_t_grid_file} -o hfds-${orca_grid}-t-grid-nemo.nc
+    ncks -O -v bounds_nav_lon     ${nemo_raw_output_t_grid_file} -o bounds-nav-lon-${orca_grid}-t-grid-nemo.nc
+    ncks -O -v bounds_nav_lat     ${nemo_raw_output_t_grid_file} -o bounds-nav-lat-${orca_grid}-t-grid-nemo.nc
 
     # u_grid as from NEMO directly:
-    ncks -O -v uo                 ${nemo_raw_output_u_grid_file} -o uo-ORCA1-u-grid-nemo.nc
-    ncks -O -v bounds_nav_lon     ${nemo_raw_output_u_grid_file} -o bounds-nav-lon-ORCA1-u-grid-nemo.nc
-    ncks -O -v bounds_nav_lat     ${nemo_raw_output_u_grid_file} -o bounds-nav-lat-ORCA1-u-grid-nemo.nc
+    ncks -O -v uo                 ${nemo_raw_output_u_grid_file} -o uo-${orca_grid}-u-grid-nemo.nc
+    ncks -O -v bounds_nav_lon     ${nemo_raw_output_u_grid_file} -o bounds-nav-lon-${orca_grid}-u-grid-nemo.nc
+    ncks -O -v bounds_nav_lat     ${nemo_raw_output_u_grid_file} -o bounds-nav-lat-${orca_grid}-u-grid-nemo.nc
 
     # v_grid as from NEMO directly:
-    ncks -O -v vo                 ${nemo_raw_output_v_grid_file} -o vo-ORCA1-v-grid-nemo.nc
-    ncks -O -v bounds_nav_lon     ${nemo_raw_output_v_grid_file} -o bounds-nav-lon-ORCA1-v-grid-nemo.nc
-    ncks -O -v bounds_nav_lat     ${nemo_raw_output_v_grid_file} -o bounds-nav-lat-ORCA1-v-grid-nemo.nc
+    ncks -O -v vo                 ${nemo_raw_output_v_grid_file} -o vo-${orca_grid}-v-grid-nemo.nc
+    ncks -O -v bounds_nav_lon     ${nemo_raw_output_v_grid_file} -o bounds-nav-lon-${orca_grid}-v-grid-nemo.nc
+    ncks -O -v bounds_nav_lat     ${nemo_raw_output_v_grid_file} -o bounds-nav-lat-${orca_grid}-v-grid-nemo.nc
 
     # w_grid as from NEMO directly:
-   #ncks -O -v wmo                ${nemo_raw_output_w_grid_file} -o wmo-ORCA1-w-grid-nemo.nc
-   #ncks -O -v bounds_nav_lon     ${nemo_raw_output_w_grid_file} -o bounds-nav-lon-ORCA1-w-grid-nemo.nc
-   #ncks -O -v bounds_nav_lat     ${nemo_raw_output_w_grid_file} -o bounds-nav-lat-ORCA1-w-grid-nemo.nc
+   #ncks -O -v wmo                ${nemo_raw_output_w_grid_file} -o wmo-${orca_grid}-w-grid-nemo.nc
+   #ncks -O -v bounds_nav_lon     ${nemo_raw_output_w_grid_file} -o bounds-nav-lon-${orca_grid}-w-grid-nemo.nc
+   #ncks -O -v bounds_nav_lat     ${nemo_raw_output_w_grid_file} -o bounds-nav-lat-${orca_grid}-w-grid-nemo.nc
 
 
     # Create the vertices-only netcdf file for the t_grid as based on the NEMO file:
-    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-ORCA1-t-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-ORCA1-t-grid.nc
-    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-ORCA1-t-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc ; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-ORCA1-t-grid.nc ; rm -f output.nc;
+    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-${orca_grid}-t-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-${orca_grid}-t-grid.nc
+    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-${orca_grid}-t-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc ; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-${orca_grid}-t-grid.nc ; rm -f output.nc;
 
     # Create the vertices-only netcdf file for the u_grid as based on the NEMO file:
-    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-ORCA1-u-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-ORCA1-u-grid.nc
-    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-ORCA1-u-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc ; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-ORCA1-u-grid.nc ; rm -f output.nc;
+    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-${orca_grid}-u-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-${orca_grid}-u-grid.nc
+    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-${orca_grid}-u-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc ; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-${orca_grid}-u-grid.nc ; rm -f output.nc;
 
     # Create the vertices-only netcdf file for the v_grid as based on the NEMO file:
-    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-ORCA1-v-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-ORCA1-v-grid.nc
-    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-ORCA1-v-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc ; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-ORCA1-v-grid.nc ; rm -f output.nc;
+    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-${orca_grid}-v-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-${orca_grid}-v-grid.nc
+    ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-${orca_grid}-v-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc ; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-${orca_grid}-v-grid.nc ; rm -f output.nc;
 
     # Create the vertices-only netcdf file for the w_grid as based on the NEMO file:
-   #ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-ORCA1-w-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-ORCA1-w-grid.nc
-   #ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-ORCA1-w-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-ORCA1-w-grid.nc ; rm -f output.nc;
+   #ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-${orca_grid}-w-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-${orca_grid}-w-grid.nc
+   #ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-${orca_grid}-w-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-${orca_grid}-w-grid.nc ; rm -f output.nc;
 
 
     # t_grid:
-    ncks -O -v hfds               ${incorrect_cmorised_t_grid_file} -o hfds-ORCA1-t-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_longitude ${incorrect_cmorised_t_grid_file} -o vertices-longitude-ORCA1-t-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_latitude  ${incorrect_cmorised_t_grid_file} -o vertices-latitude-ORCA1-t-grid-incorrect-cmorised.nc
+    ncks -O -v hfds               ${incorrect_cmorised_t_grid_file} -o hfds-${orca_grid}-t-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_longitude ${incorrect_cmorised_t_grid_file} -o vertices-longitude-${orca_grid}-t-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_latitude  ${incorrect_cmorised_t_grid_file} -o vertices-latitude-${orca_grid}-t-grid-incorrect-cmorised.nc
 
     # u_grid:
-    ncks -O -v uo                 ${incorrect_cmorised_u_grid_file} -o uo-ORCA1-u-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_longitude ${incorrect_cmorised_u_grid_file} -o vertices-longitude-ORCA1-u-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_latitude  ${incorrect_cmorised_u_grid_file} -o vertices-latitude-ORCA1-u-grid-incorrect-cmorised.nc
+    ncks -O -v uo                 ${incorrect_cmorised_u_grid_file} -o uo-${orca_grid}-u-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_longitude ${incorrect_cmorised_u_grid_file} -o vertices-longitude-${orca_grid}-u-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_latitude  ${incorrect_cmorised_u_grid_file} -o vertices-latitude-${orca_grid}-u-grid-incorrect-cmorised.nc
 
     # v_grid:
-    ncks -O -v vo                 ${incorrect_cmorised_v_grid_file} -o vo-ORCA1-v-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_longitude ${incorrect_cmorised_v_grid_file} -o vertices-longitude-ORCA1-v-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_latitude  ${incorrect_cmorised_v_grid_file} -o vertices-latitude-ORCA1-v-grid-incorrect-cmorised.nc
+    ncks -O -v vo                 ${incorrect_cmorised_v_grid_file} -o vo-${orca_grid}-v-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_longitude ${incorrect_cmorised_v_grid_file} -o vertices-longitude-${orca_grid}-v-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_latitude  ${incorrect_cmorised_v_grid_file} -o vertices-latitude-${orca_grid}-v-grid-incorrect-cmorised.nc
 
     # w_grid:
-   #ncks -O -v wo                 ${incorrect_cmorised_w_grid_file} -o wo-ORCA1-w-grid-incorrect-cmorised.nc
-   #ncks -O -v vertices_longitude ${incorrect_cmorised_w_grid_file} -o vertices-longitude-ORCA1-w-grid-incorrect-cmorised.nc
-   #ncks -O -v vertices_latitude  ${incorrect_cmorised_w_grid_file} -o vertices-latitude-ORCA1-w-grid-incorrect-cmorised.nc
+   #ncks -O -v wo                 ${incorrect_cmorised_w_grid_file} -o wo-${orca_grid}-w-grid-incorrect-cmorised.nc
+   #ncks -O -v vertices_longitude ${incorrect_cmorised_w_grid_file} -o vertices-longitude-${orca_grid}-w-grid-incorrect-cmorised.nc
+   #ncks -O -v vertices_latitude  ${incorrect_cmorised_w_grid_file} -o vertices-latitude-${orca_grid}-w-grid-incorrect-cmorised.nc
 
 
     # Create the vertices-only netcdf files which are based on the corrected cmorised files:
-    ncks -O -v vertices_longitude,vertices_latitude ${corrected_cmorised_t_grid_file} -o corrected-cmorised-vertices-ORCA1-t-grid.nc
-    ncks -O -v vertices_longitude,vertices_latitude ${corrected_cmorised_u_grid_file} -o corrected-cmorised-vertices-ORCA1-u-grid.nc
-    ncks -O -v vertices_longitude,vertices_latitude ${corrected_cmorised_v_grid_file} -o corrected-cmorised-vertices-ORCA1-v-grid.nc
+    ncks -O -v vertices_longitude,vertices_latitude ${corrected_cmorised_t_grid_file} -o corrected-cmorised-vertices-${orca_grid}-t-grid.nc
+    ncks -O -v vertices_longitude,vertices_latitude ${corrected_cmorised_u_grid_file} -o corrected-cmorised-vertices-${orca_grid}-u-grid.nc
+    ncks -O -v vertices_longitude,vertices_latitude ${corrected_cmorised_v_grid_file} -o corrected-cmorised-vertices-${orca_grid}-v-grid.nc
 
 
    # Conclusion:
@@ -114,46 +117,37 @@ if [ "$#" -eq 0 ]; then
 
 
     # Create the (non-corrected) cmorised-vertices files:
-    rsync -a vertices-longitude-ORCA1-t-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-t-grid.nc; ncks -A -v vertices_latitude vertices-latitude-ORCA1-t-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-t-grid.nc
-    rsync -a vertices-longitude-ORCA1-u-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc; ncks -A -v vertices_latitude vertices-latitude-ORCA1-u-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc
-    rsync -a vertices-longitude-ORCA1-v-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc; ncks -A -v vertices_latitude vertices-latitude-ORCA1-v-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc
+    rsync -a vertices-longitude-${orca_grid}-t-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-${orca_grid}-t-grid.nc; ncks -A -v vertices_latitude vertices-latitude-${orca_grid}-t-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-${orca_grid}-t-grid.nc
+    rsync -a vertices-longitude-${orca_grid}-u-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-${orca_grid}-u-grid.nc; ncks -A -v vertices_latitude vertices-latitude-${orca_grid}-u-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-${orca_grid}-u-grid.nc
+    rsync -a vertices-longitude-${orca_grid}-v-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-${orca_grid}-v-grid.nc; ncks -A -v vertices_latitude vertices-latitude-${orca_grid}-v-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-${orca_grid}-v-grid.nc
 
 
    # Compare the various staggered grids for the (non-corrected) cmorised files:
-    ncdiff -Oh incorrect-cmorised-vertices-ORCA1-t-grid.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc diff-cmorised-vertices-ORCA1-t-u-grid.nc;
-    ncdiff -Oh incorrect-cmorised-vertices-ORCA1-t-grid.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc diff-cmorised-vertices-ORCA1-t-v-grid.nc;
-    ncdiff -Oh incorrect-cmorised-vertices-ORCA1-u-grid.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc diff-cmorised-vertices-ORCA1-u-v-grid.nc;
-   #ncview diff-cmorised-vertices-ORCA1-t-u-grid.nc
-   #ncview diff-cmorised-vertices-ORCA1-t-v-grid.nc
-   #ncview diff-cmorised-vertices-ORCA1-u-v-grid.nc
+    ncdiff -Oh incorrect-cmorised-vertices-${orca_grid}-t-grid.nc incorrect-cmorised-vertices-${orca_grid}-u-grid.nc diff-cmorised-vertices-${orca_grid}-t-u-grid.nc;
+    ncdiff -Oh incorrect-cmorised-vertices-${orca_grid}-t-grid.nc incorrect-cmorised-vertices-${orca_grid}-v-grid.nc diff-cmorised-vertices-${orca_grid}-t-v-grid.nc;
+    ncdiff -Oh incorrect-cmorised-vertices-${orca_grid}-u-grid.nc incorrect-cmorised-vertices-${orca_grid}-v-grid.nc diff-cmorised-vertices-${orca_grid}-u-v-grid.nc;
 
    # Compare the various staggered grids for the nemo files:
-    ncdiff -Oh nemo-vertices-ORCA1-t-grid.nc nemo-vertices-ORCA1-u-grid.nc diff-nemo-vertices-ORCA1-t-u-grid.nc;
-    ncdiff -Oh nemo-vertices-ORCA1-t-grid.nc nemo-vertices-ORCA1-v-grid.nc diff-nemo-vertices-ORCA1-t-v-grid.nc;
-    ncdiff -Oh nemo-vertices-ORCA1-u-grid.nc nemo-vertices-ORCA1-v-grid.nc diff-nemo-vertices-ORCA1-u-v-grid.nc;
-   #ncview diff-nemo-vertices-ORCA1-t-u-grid.nc
-   #ncview diff-nemo-vertices-ORCA1-t-v-grid.nc
-   #ncview diff-nemo-vertices-ORCA1-u-v-grid.nc
+    ncdiff -Oh nemo-vertices-${orca_grid}-t-grid.nc nemo-vertices-${orca_grid}-u-grid.nc diff-nemo-vertices-${orca_grid}-t-u-grid.nc;
+    ncdiff -Oh nemo-vertices-${orca_grid}-t-grid.nc nemo-vertices-${orca_grid}-v-grid.nc diff-nemo-vertices-${orca_grid}-t-v-grid.nc;
+    ncdiff -Oh nemo-vertices-${orca_grid}-u-grid.nc nemo-vertices-${orca_grid}-v-grid.nc diff-nemo-vertices-${orca_grid}-u-v-grid.nc;
 
    # Compare the various staggered grids for the corrected cmorised files:
-    ncdiff -Oh corrected-cmorised-vertices-ORCA1-t-grid.nc corrected-cmorised-vertices-ORCA1-u-grid.nc diff-corrected-cmorised-vertices-ORCA1-t-u-grid.nc;
-    ncdiff -Oh corrected-cmorised-vertices-ORCA1-t-grid.nc corrected-cmorised-vertices-ORCA1-v-grid.nc diff-corrected-cmorised-vertices-ORCA1-t-v-grid.nc;
-    ncdiff -Oh corrected-cmorised-vertices-ORCA1-u-grid.nc corrected-cmorised-vertices-ORCA1-v-grid.nc diff-corrected-cmorised-vertices-ORCA1-u-v-grid.nc;
+    ncdiff -Oh corrected-cmorised-vertices-${orca_grid}-t-grid.nc corrected-cmorised-vertices-${orca_grid}-u-grid.nc diff-corrected-cmorised-vertices-${orca_grid}-t-u-grid.nc;
+    ncdiff -Oh corrected-cmorised-vertices-${orca_grid}-t-grid.nc corrected-cmorised-vertices-${orca_grid}-v-grid.nc diff-corrected-cmorised-vertices-${orca_grid}-t-v-grid.nc;
+    ncdiff -Oh corrected-cmorised-vertices-${orca_grid}-u-grid.nc corrected-cmorised-vertices-${orca_grid}-v-grid.nc diff-corrected-cmorised-vertices-${orca_grid}-u-v-grid.nc;
 
 
    # Compare corrected cmorised with (non-corrected) cmorised files:
-    ncdiff -Oh corrected-cmorised-vertices-ORCA1-t-grid.nc incorrect-cmorised-vertices-ORCA1-t-grid.nc diff-corrected-cmorised-incorrect-cmorised-vertices-ORCA1-t-grid.nc;
-    ncdiff -Oh corrected-cmorised-vertices-ORCA1-u-grid.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc diff-corrected-cmorised-incorrect-cmorised-vertices-ORCA1-u-grid.nc;
-    ncdiff -Oh corrected-cmorised-vertices-ORCA1-v-grid.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc diff-corrected-cmorised-incorrect-cmorised-vertices-ORCA1-v-grid.nc;
-
-   #ncview diff-corrected-cmorised-vertices-ORCA1-t-u-grid.nc; ncview diff-corrected-cmorised-vertices-ORCA1-t-v-grid.nc; ncview diff-corrected-cmorised-vertices-ORCA1-u-v-grid.nc;
-   #ncview diff-corrected-cmorised-incorrect-cmorised-vertices-ORCA1-t-grid.nc; ncview diff-corrected-cmorised-incorrect-cmorised-vertices-ORCA1-u-grid.nc; ncview diff-corrected-cmorised-incorrect-cmorised-vertices-ORCA1-v-grid.nc;
+    ncdiff -Oh corrected-cmorised-vertices-${orca_grid}-t-grid.nc incorrect-cmorised-vertices-${orca_grid}-t-grid.nc diff-corrected-cmorised-incorrect-cmorised-vertices-${orca_grid}-t-grid.nc;
+    ncdiff -Oh corrected-cmorised-vertices-${orca_grid}-u-grid.nc incorrect-cmorised-vertices-${orca_grid}-u-grid.nc diff-corrected-cmorised-incorrect-cmorised-vertices-${orca_grid}-u-grid.nc;
+    ncdiff -Oh corrected-cmorised-vertices-${orca_grid}-v-grid.nc incorrect-cmorised-vertices-${orca_grid}-v-grid.nc diff-corrected-cmorised-incorrect-cmorised-vertices-${orca_grid}-v-grid.nc;
 
    # Create three links for cmor-fixer tests:
    cd ../
-   if [ ! -f incorrect-cmorised-vertices-ORCA1-t-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-ORCA1-t-grid.nc incorrect-cmorised-vertices-ORCA1-t-grid.nc; fi
-   if [ ! -f incorrect-cmorised-vertices-ORCA1-u-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-ORCA1-u-grid.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc; fi
-   if [ ! -f incorrect-cmorised-vertices-ORCA1-v-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-ORCA1-v-grid.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc; fi
+   if [ ! -f incorrect-cmorised-vertices-${orca_grid}-t-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-${orca_grid}-t-grid.nc incorrect-cmorised-vertices-${orca_grid}-t-grid.nc; fi
+   if [ ! -f incorrect-cmorised-vertices-${orca_grid}-u-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-${orca_grid}-u-grid.nc incorrect-cmorised-vertices-${orca_grid}-u-grid.nc; fi
+   if [ ! -f incorrect-cmorised-vertices-${orca_grid}-v-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-${orca_grid}-v-grid.nc incorrect-cmorised-vertices-${orca_grid}-v-grid.nc; fi
 
    echo
    echo ' The script' $0 'has finished. The produced files can be found in the directory: ../nemo-vertices/compare-vertices'
@@ -238,6 +232,6 @@ fi
 # for i in {1..9}; do echo rsync -a cmor-cmip-test-all-t004-01-original/ cmor-cmip-test-all-t004-01-bup-$i; done
 # for i in {1..9}; do      rsync -a cmor-cmip-test-all-t004-01-original/ cmor-cmip-test-all-t004-01-bup-$i; done
 
-# Ruuning cmor-fixer:
+# Running cmor-fixer:
 # activatecmorfixer
 # rm -f list-of-modified-files* ;./cmor-fixer.py --verbose --olist --npp 1 --dry cmor-cmip-test-all-t004-01-bup-1/
