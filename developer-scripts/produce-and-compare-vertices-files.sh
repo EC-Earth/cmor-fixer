@@ -18,6 +18,7 @@
 
 if [ "$#" -eq 0 ]; then
 
+    rm -rf ../nemo-vertices/compare-vertices
     mkdir -p ../nemo-vertices/compare-vertices
     cd ../nemo-vertices/compare-vertices
 
@@ -75,24 +76,24 @@ if [ "$#" -eq 0 ]; then
 
 
     # t_grid:
-    ncks -O -v hfds               ${incorrect_cmorised_t_grid_file} -o hfds-t-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_longitude ${incorrect_cmorised_t_grid_file} -o vertices-longitude-t-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_latitude  ${incorrect_cmorised_t_grid_file} -o vertices-latitude-t-grid-incorrect-cmorised.nc
+    ncks -O -v hfds               ${incorrect_cmorised_t_grid_file} -o hfds-ORCA1-t-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_longitude ${incorrect_cmorised_t_grid_file} -o vertices-longitude-ORCA1-t-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_latitude  ${incorrect_cmorised_t_grid_file} -o vertices-latitude-ORCA1-t-grid-incorrect-cmorised.nc
 
     # u_grid:
-    ncks -O -v uo                 ${incorrect_cmorised_u_grid_file} -o uo-u-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_longitude ${incorrect_cmorised_u_grid_file} -o vertices-longitude-u-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_latitude  ${incorrect_cmorised_u_grid_file} -o vertices-latitude-u-grid-incorrect-cmorised.nc
+    ncks -O -v uo                 ${incorrect_cmorised_u_grid_file} -o uo-ORCA1-u-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_longitude ${incorrect_cmorised_u_grid_file} -o vertices-longitude-ORCA1-u-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_latitude  ${incorrect_cmorised_u_grid_file} -o vertices-latitude-ORCA1-u-grid-incorrect-cmorised.nc
 
     # v_grid:
-    ncks -O -v vo                 ${incorrect_cmorised_v_grid_file} -o vo-v-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_longitude ${incorrect_cmorised_v_grid_file} -o vertices-longitude-v-grid-incorrect-cmorised.nc
-    ncks -O -v vertices_latitude  ${incorrect_cmorised_v_grid_file} -o vertices-latitude-v-grid-incorrect-cmorised.nc
+    ncks -O -v vo                 ${incorrect_cmorised_v_grid_file} -o vo-ORCA1-v-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_longitude ${incorrect_cmorised_v_grid_file} -o vertices-longitude-ORCA1-v-grid-incorrect-cmorised.nc
+    ncks -O -v vertices_latitude  ${incorrect_cmorised_v_grid_file} -o vertices-latitude-ORCA1-v-grid-incorrect-cmorised.nc
 
     # w_grid:
-   #ncks -O -v wo                 ${incorrect_cmorised_w_grid_file} -o wo-w-grid-incorrect-cmorised.nc
-   #ncks -O -v vertices_longitude ${incorrect_cmorised_w_grid_file} -o vertices-longitude-w-grid-incorrect-cmorised.nc
-   #ncks -O -v vertices_latitude  ${incorrect_cmorised_w_grid_file} -o vertices-latitude-w-grid-incorrect-cmorised.nc
+   #ncks -O -v wo                 ${incorrect_cmorised_w_grid_file} -o wo-ORCA1-w-grid-incorrect-cmorised.nc
+   #ncks -O -v vertices_longitude ${incorrect_cmorised_w_grid_file} -o vertices-longitude-ORCA1-w-grid-incorrect-cmorised.nc
+   #ncks -O -v vertices_latitude  ${incorrect_cmorised_w_grid_file} -o vertices-latitude-ORCA1-w-grid-incorrect-cmorised.nc
 
 
     # Create the vertices-only netcdf files which are based on the corrected cmorised files:
@@ -113,9 +114,9 @@ if [ "$#" -eq 0 ]; then
 
 
     # Create the (non-corrected) cmorised-vertices files:
-    rsync -a vertices-longitude-t-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-t-grid.nc; ncks -A -v vertices_latitude vertices-latitude-t-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-t-grid.nc
-    rsync -a vertices-longitude-u-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc; ncks -A -v vertices_latitude vertices-latitude-u-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc
-    rsync -a vertices-longitude-v-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc; ncks -A -v vertices_latitude vertices-latitude-v-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc
+    rsync -a vertices-longitude-ORCA1-t-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-t-grid.nc; ncks -A -v vertices_latitude vertices-latitude-ORCA1-t-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-t-grid.nc
+    rsync -a vertices-longitude-ORCA1-u-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc; ncks -A -v vertices_latitude vertices-latitude-ORCA1-u-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc
+    rsync -a vertices-longitude-ORCA1-v-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc; ncks -A -v vertices_latitude vertices-latitude-ORCA1-v-grid-incorrect-cmorised.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc
 
 
    # Compare the various staggered grids for the (non-corrected) cmorised files:
@@ -148,6 +149,12 @@ if [ "$#" -eq 0 ]; then
    #ncview diff-corrected-cmorised-vertices-ORCA1-t-u-grid.nc; ncview diff-corrected-cmorised-vertices-ORCA1-t-v-grid.nc; ncview diff-corrected-cmorised-vertices-ORCA1-u-v-grid.nc;
    #ncview diff-corrected-cmorised-incorrect-cmorised-vertices-ORCA1-t-grid.nc; ncview diff-corrected-cmorised-incorrect-cmorised-vertices-ORCA1-u-grid.nc; ncview diff-corrected-cmorised-incorrect-cmorised-vertices-ORCA1-v-grid.nc;
 
+   # Create three links for cmor-fixer tests:
+   cd ../
+   if [ ! -f incorrect-cmorised-vertices-ORCA1-t-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-ORCA1-t-grid.nc incorrect-cmorised-vertices-ORCA1-t-grid.nc; fi
+   if [ ! -f incorrect-cmorised-vertices-ORCA1-u-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-ORCA1-u-grid.nc incorrect-cmorised-vertices-ORCA1-u-grid.nc; fi
+   if [ ! -f incorrect-cmorised-vertices-ORCA1-v-grid.nc ]; then ln -s compare-vertices/incorrect-cmorised-vertices-ORCA1-v-grid.nc incorrect-cmorised-vertices-ORCA1-v-grid.nc; fi
+
    echo
    echo ' The script' $0 'has finished. The produced files can be found in the directory: ../nemo-vertices/compare-vertices'
    echo
@@ -159,9 +166,9 @@ else
     echo
 fi
 
-#  vertices-longitude-t-grid-incorrect-cmorised.nc|grep -v -e history|grep -A 2 vertices_longitude
-#  vertices-longitude-u-grid-incorrect-cmorised.nc|grep -v -e history|grep -A 2 vertices_longitude
-#  vertices-longitude-v-grid-incorrect-cmorised.nc|grep -v -e history|grep -A 2 vertices_longitude
+#  vertices-longitude-ORCA1-t-grid-incorrect-cmorised.nc|grep -v -e history|grep -A 2 vertices_longitude
+#  vertices-longitude-ORCA1-u-grid-incorrect-cmorised.nc|grep -v -e history|grep -A 2 vertices_longitude
+#  vertices-longitude-ORCA1-v-grid-incorrect-cmorised.nc|grep -v -e history|grep -A 2 vertices_longitude
 
 # # t_grid:
 # vertices_longitude =
