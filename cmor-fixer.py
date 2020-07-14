@@ -25,7 +25,6 @@ skipped_attributes = ["source", "comment"]
 
 
 def load_vertices(vertices_file_name):
-    # Call example of function: lon_vertices_from_nemo_orca1_t_grid, lat_vertices_from_nemo_orca1_t_grid = load_vertices("nemo-vertices-ORCA1-t-grid.nc")
     # Loading once at the start the NEMO longitude and latitude vertices from a netcdf file:
     nemo_vertices_file_name=os.path.join("nemo-vertices", vertices_file_name)
     if os.path.isfile(nemo_vertices_file_name) == False: print(error_message, ' The netcdf data file ', nemo_vertices_file_name, '  does not exist.\n'); sys.exit()
@@ -36,18 +35,6 @@ def load_vertices(vertices_file_name):
     lat_vertices_from_nemo = np.array(lat_vertices_from_nemo_tmp[...], copy=True)
     nemo_vertices_netcdf_file.close()
     return lon_vertices_from_nemo, lat_vertices_from_nemo
-
-def load_lon_lat(lon_lat_file_name):
-    # Loading once at the start the cmorised longitudes and latitudes from a netcdf file:
-    cmorised_lon_lat_file_name=os.path.join("nemo-vertices/compare-vertices-ORCA1", lon_lat_file_name)
-    if os.path.isfile(cmorised_lon_lat_file_name) == False: print(error_message, ' The netcdf data file ', cmorised_lon_lat_file_name, '  does not exist.\n'); sys.exit()
-    cmorised_lon_lat_netcdf_file = netCDF4.Dataset(cmorised_lon_lat_file_name, 'r')
-    lon_from_nemo_tmp = cmorised_lon_lat_netcdf_file.variables["longitude"]
-    lat_from_nemo_tmp = cmorised_lon_lat_netcdf_file.variables["latitude"]
-    lon_from_nemo = np.array(lon_from_nemo_tmp[...], copy=True)
-    lat_from_nemo = np.array(lat_from_nemo_tmp[...], copy=True)
-    cmorised_lon_lat_netcdf_file.close()
-    return lon_from_nemo, lat_from_nemo
 
 # Load the vertices fields (Note these are global variables which otherwise have to be given as arguments via the function process_file to the function fix_file):
 lon_vertices_from_nemo_orca1_t_grid, lat_vertices_from_nemo_orca1_t_grid = load_vertices("nemo-vertices-ORCA1-t-grid.nc")
@@ -75,15 +62,7 @@ lon_vertices_from_cmorised_orca1_v_grid, lat_vertices_from_cmorised_orca1_v_grid
 #print('lat vertex nemo t-grid: ', lat_vertices_from_nemo_orca1_t_grid[290,105,1])         # 85.726585
 #print('lat vertex nemo u-grid: ', lat_vertices_from_nemo_orca1_u_grid[290,105,1])         # 85.51555
 #print('lat vertex nemo v-grid: ', lat_vertices_from_nemo_orca1_v_grid[290,105,1])         # 85.74064
-
-# Load the longitude and latitude fields:
-#  lon_from_cmorised_orca1_t_grid, lat_from_cmorised_orca1_t_grid = load_lon_lat("hfds-ORCA1-t-grid-incorrect-cmorised.nc")
-#  lon_from_cmorised_orca1_u_grid, lat_from_cmorised_orca1_u_grid = load_lon_lat("uo-ORCA1-u-grid-incorrect-cmorised.nc")
-#  lon_from_cmorised_orca1_v_grid, lat_from_cmorised_orca1_v_grid = load_lon_lat("vo-ORCA1-v-grid-incorrect-cmorised.nc")
-#  print(' (lon, lat) at t-grid [290,105] = ', lon_from_cmorised_orca1_t_grid[290,105], lat_from_cmorised_orca1_t_grid[290,105]) # 250.2568359375     85.9527359008789
-#  print(' (lon, lat) at u-grid [290,105] = ', lon_from_cmorised_orca1_u_grid[290,105], lat_from_cmorised_orca1_u_grid[290,105]) # 250.40127563476562 85.74063873291016
-#  print(' (lon, lat) at v-grid [290,105] = ', lon_from_cmorised_orca1_v_grid[290,105], lat_from_cmorised_orca1_v_grid[290,105]) # 253.0              85.9576187133789
-#  sys.exit()
+#sys.exit()
 
 def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
     ds = netCDF4.Dataset(path, "r+" if write else "r")
