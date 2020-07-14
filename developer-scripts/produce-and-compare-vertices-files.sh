@@ -160,78 +160,22 @@ else
     echo
 fi
 
-#  vertices-longitude-ORCA1-t-grid-incorrect-cmorised.nc|grep -v -e history|grep -A 2 vertices_longitude
-#  vertices-longitude-ORCA1-u-grid-incorrect-cmorised.nc|grep -v -e history|grep -A 2 vertices_longitude
-#  vertices-longitude-ORCA1-v-grid-incorrect-cmorised.nc|grep -v -e history|grep -A 2 vertices_longitude
 
-# # t_grid:
-# vertices_longitude =
-#  72, 73, 73, 72,
-#  73, 74, 74, 73,
-# # u_grid:
-# vertices_longitude =
-#  72.5, 73.5, 73.5, 72.5,
-#  73.5, 74.5, 74.5, 73.5,
-# # v_grid:
-# vertices_longitude =
-#  72, 73, 73, 72,
-#  73, 74, 74, 73,
+# For figuring out how to output the NEMO vertices in the NEMO raw output a search on "bounds_lon_2d" in:
+#  ${HOME}/ec-earth-3/trunk/sources/xios-2.5/doc/XIOS_user_guide.pdf
+#  ${HOME}/ec-earth-3/trunk/sources/xios-2.5/doc/XIOS_reference_guide.pdf
+# Shows that the vertices are optional XIOS arguments:
+#  cd ${HOME}/ec-earth-3/trunk/
+#  gall 'CALL.xios_set_domain_attr'|grep bounds_lon_2d
+# Gives:
+#  sources/xios-2.5/src/test/test_new_features.f90:158:  CALL xios_set_domain_attr("domain_A",bounds_lon_2d=bnds_lon,bounds_lat_2d=bnds_lat, nvertex=4, type='curvilinear')
+#
+# Note that it seems that at SMHI they get the vertices in the raw NEMO output when they activate land removal (they do this by hand and not with ELPIN).
 
 
-# From:
-# cd ${HOME}/ec-earth-3/trunk/runtime/classic/ctrl
-# gall lon|grep -v -e 'alone' -e ping -e long_name -e 'native regular 2x3 degree latxlon' -e "volc-long-eq"
+# Creating test data in order to test during development:
+#  for i in {1..9}; do rsync -a cmor-cmip-test-all-t004-01-original/ cmor-cmip-test-all-t004-01-bup-$i; done
 
-# Identical:
-# diff trunk/runtime/classic/ctrl/namelist.nemo-ORCA1L75-coupled.cfg.sh trunk-r6679/runtime/classic/ctrl/namelist.nemo-ORCA1L75-coupled.cfg.sh
-# diff trunk/runtime/classic/ctrl/namelist.nemo-ORCA025L75-coupled.cfg.sh trunk-r6679/runtime/classic/ctrl/namelist.nemo-ORCA025L75-coupled.cfg.sh
-# diff trunk/runtime/classic/ctrl/namelist.nemo.top.cfg.sh trunk-r6679/runtime/classic/ctrl/namelist.nemo.top.cfg.sh
-
-# Not in trunk-r6679:
-#  trunk/runtime/classic/ctrl/namelist.nemo-ORCA1L75-carboncycle.cfg.sh
-#  trunk/runtime/classic/ctrl/namelist.osm.sh
-
-# Not identical, but seems irrelevant:
-# diff trunk/runtime/classic/ctrl/namelist.nemo.ref.sh trunk-r6679/runtime/classic/ctrl/namelist.nemo.ref.sh
-# <    ln_dyn_trd  = .false.    ! (T) 3D momentum trend output
-# ---
-# >    ln_dyn_trd  = .TRUE.    ! (T) 3D momentum trend output
-# <    ln_tra_trd  = .false.    ! (T) 3D tracer trend output
-# ---
-# >    ln_tra_trd  = .TRUE.    ! (T) 3D tracer trend output
-
-# diff trunk/runtime/classic/ctrl/namelist.nemo.top.ref.sh trunk-r6679/runtime/classic/ctrl/namelist.nemo.top.ref.sh 
-# <     trc_rst_ctl=1
-# < elif has_config pisces:start_from_restart
-# < then
-# <     trc_restart=".TRUE."
-# <     trc_rst_ctl=0
-# <     trc_rst_ctl=0
-# <    nn_rsttr      = $trc_rst_ctl !  restart control = 0 initial time step is not compared to the restart file value
-# ---
-# >    nn_rsttr      =   0       !  restart control = 0 initial time step is not compared to the restart file value
-
-
-
-# I have also added the file_def and field_def files that have been used in that experiment. 
-# These files are directly taken from the trunk (r6679), no modifications.
-# I used the trunk because I wanted start the experiments quickly and didn't want wait for the tagged version.
-
-# Is there any other XIOS control file (namelist?) that could be different?
-
-# op ${HOME}/ec-earth-3/trunk/sources/xios-2.5/doc/XIOS_user_guide.pdf
-# op ${HOME}/ec-earth-3/trunk/sources/xios-2.5/doc/XIOS_reference_guide.pdf
-
-# cd ${HOME}/ec-earth-3/trunk/
-# gall 'CALL.xios_set_domain_attr'|grep bounds_lon_2d
-# sources/xios-2.5/src/test/test_new_features.f90:158:  CALL xios_set_domain_attr("domain_A",bounds_lon_2d=bnds_lon,bounds_lat_2d=bnds_lat, nvertex=4, type='curvilinear')
-
-
-
-# Creating test data:
-# for i in {1..9}; do echo rsync -a cmor-cmip-test-all-t004-01-original/ cmor-cmip-test-all-t004-01-bup-$i; done
-# for i in {1..9}; do      rsync -a cmor-cmip-test-all-t004-01-original/ cmor-cmip-test-all-t004-01-bup-$i; done
-
-# Running cmor-fixer:
-# activatecmorfixer
-# rm -f list-of-modified-files* ;./cmor-fixer.py --verbose --olist --npp 1 --dry cmor-cmip-test-all-t004-01-bup-1/
+# Running the cmor-fixer in order to test during development:
+#  activatecmorfixer
+#  rm -f list-of-modified-files* ;./cmor-fixer.py --verbose --olist --npp 1 --dry cmor-cmip-test-all-t004-01-bup-1/
