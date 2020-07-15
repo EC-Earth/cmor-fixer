@@ -46,7 +46,8 @@ lon_vertices_from_nemo_orca1_u_grid = np.where(lon_vertices_from_nemo_orca1_u_gr
 lon_vertices_from_nemo_orca1_v_grid = np.where(lon_vertices_from_nemo_orca1_v_grid < 0, lon_vertices_from_nemo_orca1_v_grid + 360.0, lon_vertices_from_nemo_orca1_v_grid)
 
 # The vertices fields on an ORCA1 grid have the following dimension sizes (used to check whether the considered grid is ORCA1):
-orca1_grid_shape = (292, 362, 4)
+orca1_grid_shape   = ( 292,  362, 4)
+orca025_grid_shape = (1050, 1442, 4)
 
 # Determine a distinguising point with which help we can distinguish the t, u and v grid (Needed for the vertices correction):
 # Load the vertices fields (Note these are global variables which otherwise have to be given as arguments via the function process_file to the function fix_file):
