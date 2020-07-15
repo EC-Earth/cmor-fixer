@@ -139,6 +139,9 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
     # https://github.com/EC-Earth/ece2cmor3/issues/625
     for key in ds.variables:
      if key == "vertices_longitude" and getattr(ds, "grid_label") == "gn":
+      if ds.variables[key][...].shape != orca1_grid_shape:
+       print(warning_message, 'The cmor-fixer currently only supports the vertices fix for the ORCA1 grid. Here a different grid sizeis detected: ', ds.variables[key][...].shape, '\n')
+       break
       # In order to detect whether the cmorised file contains the vertices which are not directly based on the NEMO
       # data (and thus have the dateline BUG in the longitude vertices), the values of a single point [290,105,1] is
       # checked in the vertices_longitude field. This point has always different values for each t, u and v-grid
@@ -150,9 +153,6 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
       if (math.isclose(ds.variables[key][290,105,1], 250.39437866210938, rel_tol=1e-5) or \
           math.isclose(ds.variables[key][290,105,1], 250.52598571777344, rel_tol=1e-5) or \
           math.isclose(ds.variables[key][290,105,1], 253.0             , rel_tol=1e-5)):
-       if lon_vertices_from_nemo_orca1_t_grid[...].shape != orca1_grid_shape:
-        print(warning_message, 'Incorrect vertices have been detected, however cmor-fixer currently only supports a fix for the ORCA1 grid. Here different grid sizes are detected: ', lon_vertices_from_nemo_orca1_t_grid[...].shape, '\n')
-        break
        if   math.isclose(ds.variables[key][290,105,1], 250.39437866210938, rel_tol=1e-5):
         log.info('Replacing the longitude and latitude t-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
         if write:
