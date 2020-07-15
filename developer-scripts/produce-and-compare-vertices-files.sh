@@ -39,12 +39,12 @@ if [ "$#" -eq 1 ]; then
       nemo_raw_output_v_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_V_3D.nc
      #nemo_raw_output_w_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_W_3D.nc
 
-      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/hfds/gn/v20200506/hfds_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/tos/gn/v20200506/tos_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
       incorrect_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/uo/gn/v20200506/uo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
       incorrect_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/vo/gn/v20200506/vo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
      #incorrect_cmorised_w_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/wo/gn/v20200506/wo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
 
-      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/hfds/gn/v20200506/hfds_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/tos/gn/v20200506/tos_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
       corrected_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/uo/gn/v20200506/uo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
       corrected_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/vo/gn/v20200506/vo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
     fi
@@ -55,18 +55,18 @@ if [ "$#" -eq 1 ]; then
       nemo_raw_output_v_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_V.nc
      #nemo_raw_output_w_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_W.nc
 
-      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-original/Omon/hfds/gn/????/hfds_Omon_EC-Earth3_piControl_????_gn_????.nc
+      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-original/Omon/tos/gn/????/tos_Omon_EC-Earth3_piControl_????_gn_????.nc
       incorrect_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-original/Omon/uo/gn/????/uo_Omon_EC-Earth3_piControl_????_gn_????.nc
       incorrect_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-original/Omon/vo/gn/????/vo_Omon_EC-Earth3_piControl_????_gn_????.nc
      #incorrect_cmorised_w_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-original/Omon/wo/gn/????/wo_Omon_EC-Earth3_piControl_????_gn_????.nc
 
-      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-bup-1/Omon/hfds/gn/????/hfds_Omon_EC-Earth3_piControl_????_gn_????.nc
+      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-bup-1/Omon/tos/gn/????/tos_Omon_EC-Earth3_piControl_????_gn_????.nc
       corrected_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-bup-1/Omon/uo/gn/????/uo_Omon_EC-Earth3_piControl_????_gn_????.nc
       corrected_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-bup-1/Omon/vo/gn/????/vo_Omon_EC-Earth3_piControl_????_gn_????.nc
     fi
 
     # t_grid as from NEMO directly:
-    ncks -O -v tos               ${nemo_raw_output_t_grid_file} -o tos-${orca_grid}-t-grid-nemo.nc
+    ncks -O -v tos                ${nemo_raw_output_t_grid_file} -o tos-${orca_grid}-t-grid-nemo.nc
     ncks -O -v bounds_nav_lon     ${nemo_raw_output_t_grid_file} -o bounds-nav-lon-${orca_grid}-t-grid-nemo.nc
     ncks -O -v bounds_nav_lat     ${nemo_raw_output_t_grid_file} -o bounds-nav-lat-${orca_grid}-t-grid-nemo.nc
 
@@ -110,7 +110,7 @@ if [ "$#" -eq 1 ]; then
     fi
 
     # t_grid:
-    ncks -O -v hfds               ${incorrect_cmorised_t_grid_file} -o hfds-${orca_grid}-t-grid-incorrect-cmorised.nc
+    ncks -O -v tos                ${incorrect_cmorised_t_grid_file} -o tos-${orca_grid}-t-grid-incorrect-cmorised.nc
     ncks -O -v vertices_longitude ${incorrect_cmorised_t_grid_file} -o vertices-longitude-${orca_grid}-t-grid-incorrect-cmorised.nc
     ncks -O -v vertices_latitude  ${incorrect_cmorised_t_grid_file} -o vertices-latitude-${orca_grid}-t-grid-incorrect-cmorised.nc
 
