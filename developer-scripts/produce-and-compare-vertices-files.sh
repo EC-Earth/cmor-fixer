@@ -16,32 +16,57 @@
 # Or with the .sha1 file by:
 #  sha1sum -c this-dir.sha1
 
-if [ "$#" -eq 0 ]; then
+if [ "$#" -eq 1 ]; then
 
-    orca_grid=ORCA1
-   #orca_grid=ORCA025
+    orca_grid=$1
+
+    if [ "${orca_grid}" = "ORCA1" ] || [ "${orca_grid}" = "ORCA025" ]; then
+        echo ' Producing the' ${orca_grid} 'files.'
+    else
+        echo -e "\e[1;31m Error:\e[0m"' The ' ${orca_grid} 'is not available, use:'
+        echo '  ' $0 'ORCA1'
+        echo '  ' $0 'ORCA025'
+        exit 1
+    fi
 
     rm -rf ../nemo-vertices/compare-vertices-${orca_grid}
     mkdir -p ../nemo-vertices/compare-vertices-${orca_grid}
     cd ../nemo-vertices/compare-vertices-${orca_grid}
 
-    nemo_raw_output_t_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_T_2D.nc
-    nemo_raw_output_u_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_U_3D.nc
-    nemo_raw_output_v_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_V_3D.nc
-   #nemo_raw_output_w_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_W_3D.nc
+    if [ "${orca_grid}" = "ORCA1" ]; then
+      nemo_raw_output_t_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_T_2D.nc
+      nemo_raw_output_u_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_U_3D.nc
+      nemo_raw_output_v_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_V_3D.nc
+     #nemo_raw_output_w_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/t621_1m_20150101_20151231_opa_grid_W_3D.nc
 
-    incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/hfds/gn/v20200506/hfds_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
-    incorrect_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/uo/gn/v20200506/uo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
-    incorrect_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/vo/gn/v20200506/vo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
-   #incorrect_cmorised_w_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/wo/gn/v20200506/wo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/hfds/gn/v20200506/hfds_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+      incorrect_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/uo/gn/v20200506/uo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+      incorrect_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/vo/gn/v20200506/vo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+     #incorrect_cmorised_w_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-original/Omon/wo/gn/v20200506/wo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
 
-    corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/hfds/gn/v20200506/hfds_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
-    corrected_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/uo/gn/v20200506/uo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
-    corrected_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/vo/gn/v20200506/vo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/hfds/gn/v20200506/hfds_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+      corrected_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/uo/gn/v20200506/uo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+      corrected_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t004-01-bup-1/Omon/vo/gn/v20200506/vo_Omon_EC-Earth3_piControl_r1i1p1f1_gn_199001-199012.nc
+    fi
 
+    if [ "${orca_grid}" = "ORCA025" ]; then
+      nemo_raw_output_t_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_T.nc
+      nemo_raw_output_u_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_U.nc
+      nemo_raw_output_v_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_V.nc
+     #nemo_raw_output_w_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_W.nc
+
+      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-original/Omon/hfds/gn/????/hfds_Omon_EC-Earth3_piControl_????_gn_????.nc
+      incorrect_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-original/Omon/uo/gn/????/uo_Omon_EC-Earth3_piControl_????_gn_????.nc
+      incorrect_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-original/Omon/vo/gn/????/vo_Omon_EC-Earth3_piControl_????_gn_????.nc
+     #incorrect_cmorised_w_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-original/Omon/wo/gn/????/wo_Omon_EC-Earth3_piControl_????_gn_????.nc
+
+      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-bup-1/Omon/hfds/gn/????/hfds_Omon_EC-Earth3_piControl_????_gn_????.nc
+      corrected_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-bup-1/Omon/uo/gn/????/uo_Omon_EC-Earth3_piControl_????_gn_????.nc
+      corrected_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/cmor-cmip-test-all-t00?-bup-1/Omon/vo/gn/????/vo_Omon_EC-Earth3_piControl_????_gn_????.nc
+    fi
 
     # t_grid as from NEMO directly:
-    ncks -O -v hfds               ${nemo_raw_output_t_grid_file} -o hfds-${orca_grid}-t-grid-nemo.nc
+    ncks -O -v tos               ${nemo_raw_output_t_grid_file} -o tos-${orca_grid}-t-grid-nemo.nc
     ncks -O -v bounds_nav_lon     ${nemo_raw_output_t_grid_file} -o bounds-nav-lon-${orca_grid}-t-grid-nemo.nc
     ncks -O -v bounds_nav_lat     ${nemo_raw_output_t_grid_file} -o bounds-nav-lat-${orca_grid}-t-grid-nemo.nc
 
@@ -77,6 +102,12 @@ if [ "$#" -eq 0 ]; then
    #ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-${orca_grid}-w-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-${orca_grid}-w-grid.nc
    #ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-${orca_grid}-w-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-${orca_grid}-w-grid.nc ; rm -f output.nc;
 
+
+    if [ "${orca_grid}" = "ORCA025" ]; then
+      echo -e "\e[1;31m Error:\e[0m"' The ' ${orca_grid} 'option is under construction, so only a part of the' $0 'script is executed.'
+      echo ' The produced files can be found in the directory: ../nemo-vertices/compare-vertices'-${orca_grid}
+      exit 1
+    fi
 
     # t_grid:
     ncks -O -v hfds               ${incorrect_cmorised_t_grid_file} -o hfds-${orca_grid}-t-grid-incorrect-cmorised.nc
@@ -155,8 +186,9 @@ if [ "$#" -eq 0 ]; then
 
 else
     echo
-    echo '  This script requires no arguments, call example:'
-    echo '  ' $0 
+    echo '  This script requires one argument, the ORCA resolution:'
+    echo '  ' $0 'ORCA1'
+    echo '  ' $0 'ORCA025'
     echo
 fi
 
