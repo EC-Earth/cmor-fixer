@@ -60,32 +60,36 @@ def show_incorrect_selection_point_values():
     lon_vertices_from_incorrect_cmorised_orca1_t_grid, lat_vertices_from_incorrect_cmorised_orca1_t_grid = load_vertices("incorrect-cmorised-vertices-ORCA1-t-grid.nc")
     lon_vertices_from_incorrect_cmorised_orca1_u_grid, lat_vertices_from_incorrect_cmorised_orca1_u_grid = load_vertices("incorrect-cmorised-vertices-ORCA1-u-grid.nc")
     lon_vertices_from_incorrect_cmorised_orca1_v_grid, lat_vertices_from_incorrect_cmorised_orca1_v_grid = load_vertices("incorrect-cmorised-vertices-ORCA1-v-grid.nc")
-    print('lon vertex cmor t-grid for ORCA1: ', lon_vertices_from_incorrect_cmorised_orca1_t_grid[290,105,1])       # 250.39437866210938  this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
-    print('lon vertex cmor u-grid for ORCA1: ', lon_vertices_from_incorrect_cmorised_orca1_u_grid[290,105,1])       # 250.52598571777344  this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
-    print('lon vertex cmor v-grid for ORCA1: ', lon_vertices_from_incorrect_cmorised_orca1_v_grid[290,105,1])       # 253.0               this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
-    print('lon vertex nemo t-grid for ORCA1: ', lon_vertices_from_nemo_orca1_t_grid[290,105,1])                     # 247.78886
-    print('lon vertex nemo u-grid for ORCA1: ', lon_vertices_from_nemo_orca1_u_grid[290,105,1])                     # 248.04973
-    print('lon vertex nemo v-grid for ORCA1: ', lon_vertices_from_nemo_orca1_v_grid[290,105,1])                     # 250.40128
-    print('lat vertex nemo t-grid for ORCA1: ', lat_vertices_from_nemo_orca1_t_grid[290,105,1])                     # 85.726585
-    print('lat vertex nemo u-grid for ORCA1: ', lat_vertices_from_nemo_orca1_u_grid[290,105,1])                     # 85.51555
-    print('lat vertex nemo v-grid for ORCA1: ', lat_vertices_from_nemo_orca1_v_grid[290,105,1])                     # 85.74064
+    i =  290
+    j =  105
+    k =    1
+    print('lon vertex cmor t-grid for ORCA1: ', lon_vertices_from_incorrect_cmorised_orca1_t_grid[i,j,k])       # 250.39437866210938  this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
+    print('lon vertex cmor u-grid for ORCA1: ', lon_vertices_from_incorrect_cmorised_orca1_u_grid[i,j,k])       # 250.52598571777344  this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
+    print('lon vertex cmor v-grid for ORCA1: ', lon_vertices_from_incorrect_cmorised_orca1_v_grid[i,j,k])       # 253.0               this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
+    print('lon vertex nemo t-grid for ORCA1: ', lon_vertices_from_nemo_orca1_t_grid[i,j,k])                     # 247.78886
+    print('lon vertex nemo u-grid for ORCA1: ', lon_vertices_from_nemo_orca1_u_grid[i,j,k])                     # 248.04973
+    print('lon vertex nemo v-grid for ORCA1: ', lon_vertices_from_nemo_orca1_v_grid[i,j,k])                     # 250.40128
+    print('lat vertex nemo t-grid for ORCA1: ', lat_vertices_from_nemo_orca1_t_grid[i,j,k])                     # 85.726585
+    print('lat vertex nemo u-grid for ORCA1: ', lat_vertices_from_nemo_orca1_u_grid[i,j,k])                     # 85.51555
+    print('lat vertex nemo v-grid for ORCA1: ', lat_vertices_from_nemo_orca1_v_grid[i,j,k])                     # 85.74064
     print('')
-    # WAITING FOR INCORRECT CMORISED ORCA025 T-, U-, V-GRID files:
     lon_vertices_from_incorrect_cmorised_orca025_t_grid, lat_vertices_from_incorrect_cmorised_orca025_t_grid = load_vertices("incorrect-cmorised-vertices-ORCA025-t-grid.nc")
     lon_vertices_from_incorrect_cmorised_orca025_u_grid, lat_vertices_from_incorrect_cmorised_orca025_u_grid = load_vertices("incorrect-cmorised-vertices-ORCA025-u-grid.nc")
     lon_vertices_from_incorrect_cmorised_orca025_v_grid, lat_vertices_from_incorrect_cmorised_orca025_v_grid = load_vertices("incorrect-cmorised-vertices-ORCA025-v-grid.nc")
-    print('lon vertex cmor t-grid for ORCA025: ', lon_vertices_from_incorrect_cmorised_orca025_t_grid[290,105,1])   # 250.39437866210938  this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
-    print('lon vertex cmor u-grid for ORCA025: ', lon_vertices_from_incorrect_cmorised_orca025_u_grid[290,105,1])   # 250.52598571777344  this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
-    print('lon vertex cmor v-grid for ORCA025: ', lon_vertices_from_incorrect_cmorised_orca025_v_grid[290,105,1])   # 253.0               this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
-    print('lon vertex nemo t-grid for ORCA025: ', lon_vertices_from_nemo_orca025_t_grid[290,105,1])                 # 247.78886
-    print('lon vertex nemo u-grid for ORCA025: ', lon_vertices_from_nemo_orca025_u_grid[290,105,1])                 # 248.04973
-    print('lon vertex nemo v-grid for ORCA025: ', lon_vertices_from_nemo_orca025_v_grid[290,105,1])                 # 250.40128
-    print('lat vertex nemo t-grid for ORCA025: ', lat_vertices_from_nemo_orca025_t_grid[290,105,1])                 # 85.726585
-    print('lat vertex nemo u-grid for ORCA025: ', lat_vertices_from_nemo_orca025_u_grid[290,105,1])                 # 85.51555
-    print('lat vertex nemo v-grid for ORCA025: ', lat_vertices_from_nemo_orca025_v_grid[290,105,1])                 # 85.74064
+    i = 1020
+    j = 1220
+    k =    1
+    print('lon vertex cmor t-grid for ORCA025: ', lon_vertices_from_incorrect_cmorised_orca025_t_grid[i,j,k])   # 63.96732   this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
+    print('lon vertex cmor u-grid for ORCA025: ', lon_vertices_from_incorrect_cmorised_orca025_u_grid[i,j,k])   # 64.00045   this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
+    print('lon vertex cmor v-grid for ORCA025: ', lon_vertices_from_incorrect_cmorised_orca025_v_grid[i,j,k])   # 64.135735  this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
+    print('lon vertex nemo t-grid for ORCA025: ', lon_vertices_from_nemo_orca025_t_grid[i,j,k])                 # 63.664692
+    print('lon vertex nemo u-grid for ORCA025: ', lon_vertices_from_nemo_orca025_u_grid[i,j,k])                 # 63.698845
+    print('lon vertex nemo v-grid for ORCA025: ', lon_vertices_from_nemo_orca025_v_grid[i,j,k])                 # 63.832607
+    print('lat vertex nemo t-grid for ORCA025: ', lat_vertices_from_nemo_orca025_t_grid[i,j,k])                 # 71.83984
+    print('lat vertex nemo u-grid for ORCA025: ', lat_vertices_from_nemo_orca025_u_grid[i,j,k])                 # 71.78468
+    print('lat vertex nemo v-grid for ORCA025: ', lat_vertices_from_nemo_orca025_v_grid[i,j,k])                 # 71.84987
     print('')
 show_incorrect_selection_point_values()
-
 
 # Load the longitude and latitude fields from the incorrect cmorised ORCA1 grid:
 lon_from_cmorised_orca1_t_grid, lat_from_cmorised_orca1_t_grid = load_lon_lat("../nemo-vertices/compare-vertices-ORCA1", "tos-ORCA1-t-grid-incorrect-cmorised.nc", "longitude", "latitude")
@@ -132,15 +136,16 @@ else:
 
 np.subtract(lon_from_cmorised_orca1_t_grid, lon_from_nemo_orca1_t_grid)
 
-# Load the longitude and latitude fields from the NEMO ORCA1 grid:
+
+# Load the longitude and latitude fields from the NEMO ORCA025 grid:
 lon_from_nemo_orca025_t_grid, lat_from_nemo_orca025_t_grid = load_lon_lat("../nemo-vertices/compare-vertices-ORCA025", "tos-ORCA025-t-grid-nemo.nc", "nav_lon", "nav_lat")
 lon_from_nemo_orca025_u_grid, lat_from_nemo_orca025_u_grid = load_lon_lat("../nemo-vertices/compare-vertices-ORCA025", "uo-ORCA025-u-grid-nemo.nc" , "nav_lon", "nav_lat")
 lon_from_nemo_orca025_v_grid, lat_from_nemo_orca025_v_grid = load_lon_lat("../nemo-vertices/compare-vertices-ORCA025", "vo-ORCA025-v-grid-nemo.nc" , "nav_lon", "nav_lat")
-i = 290
-j = 105
-print(' (lon, lat) at ORCA025 t-grid [{:1},{:1}] = {:4.15f} {:}'.format(i, j, lon_from_nemo_orca025_t_grid[i,j], lat_from_nemo_orca025_t_grid[i,j])) # 
-print(' (lon, lat) at ORCA025 u-grid [{:1},{:1}] = {:4.15f} {:}'.format(i, j, lon_from_nemo_orca025_u_grid[i,j], lat_from_nemo_orca025_u_grid[i,j])) # 
-print(' (lon, lat) at ORCA025 v-grid [{:1},{:1}] = {:4.15f} {:}'.format(i, j, lon_from_nemo_orca025_v_grid[i,j], lat_from_nemo_orca025_v_grid[i,j])) # 
+i =  270
+j = 1000
+print(' (lon, lat) at ORCA025 t-grid [{:1},{:1}] = {:4.15f} {:}'.format(i, j, lon_from_nemo_orca025_t_grid[i,j], lat_from_nemo_orca025_t_grid[i,j])) #  (lon, lat) at ORCA025 t-grid [270,1000] = -37.250000000000000 -53.905487060546875
+print(' (lon, lat) at ORCA025 u-grid [{:1},{:1}] = {:4.15f} {:}'.format(i, j, lon_from_nemo_orca025_u_grid[i,j], lat_from_nemo_orca025_u_grid[i,j])) #  (lon, lat) at ORCA025 u-grid [270,1000] = -37.125000000000000 -53.905487060546875
+print(' (lon, lat) at ORCA025 v-grid [{:1},{:1}] = {:4.15f} {:}'.format(i, j, lon_from_nemo_orca025_v_grid[i,j], lat_from_nemo_orca025_v_grid[i,j])) #  (lon, lat) at ORCA025 v-grid [270,1000] = -37.250000000000000 -53.831783294677734
 print('')
 
 
