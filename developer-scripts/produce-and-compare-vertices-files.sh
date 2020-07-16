@@ -101,13 +101,6 @@ if [ "$#" -eq 1 ]; then
    #ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lon-${orca_grid}-w-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lon,vertices_longitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; mv -f output.nc nemo-vertices-${orca_grid}-w-grid.nc
    #ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-${orca_grid}-w-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-${orca_grid}-w-grid.nc ; rm -f output.nc;
 
-
-   #if [ "${orca_grid}" = "ORCA025" ]; then
-   #  echo -e "\e[1;31m Error:\e[0m"' The ' ${orca_grid} 'option is under construction, so only a part of the' $0 'script is executed.'
-   #  echo ' The produced files can be found in the directory: ../nemo-vertices/compare-vertices'-${orca_grid}
-   #  exit 1
-   #fi
-
     # t_grid:
     ncks -O -v tos                ${incorrect_cmorised_t_grid_file} -o tos-${orca_grid}-t-grid-incorrect-cmorised.nc
     ncks -O -v vertices_longitude ${incorrect_cmorised_t_grid_file} -o vertices-longitude-${orca_grid}-t-grid-incorrect-cmorised.nc
