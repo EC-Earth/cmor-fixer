@@ -55,14 +55,13 @@ if [ "$#" -eq 1 ]; then
       nemo_raw_output_v_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_V.nc
      #nemo_raw_output_w_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_W.nc
 
-      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/test-data/cmor-cmip-test-all-t00?-original/Omon/tos/gn/????/tos_Omon_EC-Earth3_piControl_????_gn_????.nc
-      incorrect_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/test-data/cmor-cmip-test-all-t00?-original/Omon/uo/gn/????/uo_Omon_EC-Earth3_piControl_????_gn_????.nc
-      incorrect_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/test-data/cmor-cmip-test-all-t00?-original/Omon/vo/gn/????/vo_Omon_EC-Earth3_piControl_????_gn_????.nc
-     #incorrect_cmorised_w_grid_file=${HOME}/cmorize/cmor-fixer/test-data/cmor-cmip-test-all-t00?-original/Omon/wo/gn/????/wo_Omon_EC-Earth3_piControl_????_gn_????.nc
+      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-original/vo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
+      incorrect_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-original/uo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
+      incorrect_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-original/tos_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
 
-      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/test-data/cmor-cmip-test-all-t00?-test-1/Omon/tos/gn/????/tos_Omon_EC-Earth3_piControl_????_gn_????.nc
-      corrected_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/test-data/cmor-cmip-test-all-t00?-test-1/Omon/uo/gn/????/uo_Omon_EC-Earth3_piControl_????_gn_????.nc
-      corrected_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/test-data/cmor-cmip-test-all-t00?-test-1/Omon/vo/gn/????/vo_Omon_EC-Earth3_piControl_????_gn_????.nc
+      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-test-1/vo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
+      corrected_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-test-1/uo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
+      corrected_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-test-1/tos_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
     fi
 
     # t_grid as from NEMO directly:
@@ -103,11 +102,11 @@ if [ "$#" -eq 1 ]; then
    #ncatted -Oh -a name,global,d,, -a description,global,d,, -a title,global,d,, -a Conventions,global,d,, -a timeStamp,global,d,, -a uuid,global,d,, -a NCO,global,d,, -a history,global,d,, bounds-nav-lat-${orca_grid}-w-grid-nemo.nc -o output.nc; ncrename -Oh -v bounds_nav_lat,vertices_latitude output.nc; ncrename -Oh -d x,i output.nc; ncrename -Oh -d y,j output.nc; ncrename -Oh -d nvertex,vertices output.nc; ncks -Ah -v vertices_latitude output.nc nemo-vertices-${orca_grid}-w-grid.nc ; rm -f output.nc;
 
 
-    if [ "${orca_grid}" = "ORCA025" ]; then
-      echo -e "\e[1;31m Error:\e[0m"' The ' ${orca_grid} 'option is under construction, so only a part of the' $0 'script is executed.'
-      echo ' The produced files can be found in the directory: ../nemo-vertices/compare-vertices'-${orca_grid}
-      exit 1
-    fi
+   #if [ "${orca_grid}" = "ORCA025" ]; then
+   #  echo -e "\e[1;31m Error:\e[0m"' The ' ${orca_grid} 'option is under construction, so only a part of the' $0 'script is executed.'
+   #  echo ' The produced files can be found in the directory: ../nemo-vertices/compare-vertices'-${orca_grid}
+   #  exit 1
+   #fi
 
     # t_grid:
     ncks -O -v tos                ${incorrect_cmorised_t_grid_file} -o tos-${orca_grid}-t-grid-incorrect-cmorised.nc
@@ -212,3 +211,4 @@ fi
 # Running the cmor-fixer in order to test during development:
 #  activatecmorfixer
 #  rm -f list-of-modified-files* ;./cmor-fixer.py --verbose --olist --npp 1 --dry test-data/cmor-cmip-test-all-t004-01-test-1/
+#  rm -f list-of-modified-files* ;./cmor-fixer.py --verbose --olist --npp 1 --dry test-data/ORCA025-grid-files-test-1/
