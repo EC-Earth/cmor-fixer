@@ -55,13 +55,13 @@ if [ "$#" -eq 1 ]; then
       nemo_raw_output_v_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_V.nc
      #nemo_raw_output_w_grid_file=${HOME}/cmorize/cmor-fixer/data-vertices/data-vertices-from-smhi/HC02_1m_20090101_20091231_grid_W.nc
 
-      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-original/vo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
+      incorrect_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-original/tos_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
       incorrect_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-original/uo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
-      incorrect_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-original/tos_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
+      incorrect_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-original/vo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
 
-      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-test-1/vo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
+      corrected_cmorised_t_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-test-1/tos_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
       corrected_cmorised_u_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-test-1/uo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
-      corrected_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-test-1/tos_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
+      corrected_cmorised_v_grid_file=${HOME}/cmorize/cmor-fixer/test-data/ORCA025-grid-files-test-1/vo_Omon_EC-Earth3P-HR_hist-1950_r3i1p2f1_gn_195101-195112.nc
     fi
 
     # t_grid as from NEMO directly:
