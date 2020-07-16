@@ -154,20 +154,16 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
       if ds.variables[key][...].shape != orca1_grid_shape and ds.variables[key][...].shape != orca025_grid_shape:
        print(warning_message, 'The cmor-fixer currently only supports the vertices fix for the ORCA1 & ORCA025 grid. Here a different grid size is detected: ', ds.variables[key][...].shape, '\n')
        break
-     ## Temporary another under construction abort + message here:
-     #if ds.variables[key][...].shape != orca1_grid_shape:
-     # print(warning_message, 'The cmor-fixer currently only supports the vertices fix for the ORCA1 grid. Here a different grid size is detected: ', ds.variables[key][...].shape, '\n')
-     # break  # Currently: When this break is commented the vertices for an ORCA025 grid will be applied without checking whether they are incorrect or correct already.
       # Check and veritces fix for the ORCA1 grid:
       if ds.variables[key][...].shape == orca1_grid_shape:
-       # In order to detect whether the cmorised file contains the vertices which are not directly based on the NEMO
-       # data (and thus have the dateline BUG in the longitude vertices), the values of a single point [290,105,1] is
-       # checked in the ORCA1 vertices_longitude field. This point has always different values for each t, u and v-grid
-       # after replacing them by the NEMO based ones:
+       # In order to detect whether the cmorised file contains vertices which are not based on the NEMO data (and thus have the
+       # dateline BUG in the longitude vertices), the values of a single ORCA1 vertices_longitude point [290,105,1] is checked.
+       # This point is selected because it has always different values for on the t-, u- and v-grid and for each staggered grid
+       # The value is different between the incorrect & corrected data:
        # Check on t-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 250.39437866210938 then it concerns the incorrect data.
        # Check on u-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 250.52598571777344 then it concerns the incorrect data.
        # Check on v-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 253.0              then it concerns the incorrect data.
-       # Note that based on this detection of the vertices_longitude also the vertices_latitude are changed.
+       # Note that based on this detection of the vertices_longitude, both the vertices_longitude & vertices_latitude are changed.
        if (math.isclose(ds.variables[key][290,105,1], 250.39437866210938, rel_tol=1e-5) or \
            math.isclose(ds.variables[key][290,105,1], 250.52598571777344, rel_tol=1e-5) or \
            math.isclose(ds.variables[key][290,105,1], 253.0             , rel_tol=1e-5)):
@@ -179,14 +175,12 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
           modified = True
         elif math.isclose(ds.variables[key][290,105,1], 250.52598571777344, rel_tol=1e-5):
          log.info('Replacing the longitude and latitude u-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
-        #print(warning_message, 'u', ds.variables[key][290,105,1], ' should be 250.52598571777344')
          if write:
           ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_u_grid[...]  # Replacing the longitude vertices
           ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_u_grid[...]  # Replacing the latitude  vertices
           modified = True
         elif math.isclose(ds.variables[key][290,105,1], 253.0, rel_tol=1e-5):
          log.info('Replacing the longitude and latitude v-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
-        #print(warning_message, 'v', ds.variables[key][290,105,1], ' should be 253.0')
          if write:
           ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_v_grid[...]  # Replacing the longitude vertices
           ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_v_grid[...]  # Replacing the latitude  vertices
@@ -195,14 +189,14 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
          print(error_message, ' The cmor-fixer failed to determine the staggered grid in the procedure to fix the NEMO vertices. \n'); sys.exit()
       # Check and veritces fix for the ORCA025 grid:
       if ds.variables[key][...].shape == orca025_grid_shape:
-       # In order to detect whether the cmorised file contains the vertices which are not directly based on the NEMO
-       # data (and thus have the dateline BUG in the longitude vertices), the values of a single point [1020,1220,1] is
-       # checked in the ORCA025 vertices_longitude field. This point has always different values for each t, u and v-grid
-       # after replacing them by the NEMO based ones:
+       # In order to detect whether the cmorised file contains vertices which are not based on the NEMO data (and thus have the
+       # dateline BUG in the longitude vertices), the values of a single ORCA025 vertices_longitude point [1020,1220,1] is checked.
+       # This point is selected because it has always different values for on the t-, u- and v-grid and for each staggered grid
+       # The value is different between the incorrect & corrected data:
        # Check on t-grid for incorrect cmorised data: if ds.variables[key][1020,1220,1] equals 63.96732  then it concerns the incorrect data.
        # Check on u-grid for incorrect cmorised data: if ds.variables[key][1020,1220,1] equals 64.00045  then it concerns the incorrect data.
        # Check on v-grid for incorrect cmorised data: if ds.variables[key][1020,1220,1] equals 64.135735 then it concerns the incorrect data.
-       # Note that based on this detection of the vertices_longitude also the vertices_latitude are changed.
+       # Note that based on this detection of the vertices_longitude, both the vertices_longitude & vertices_latitude are changed.
        if (math.isclose(ds.variables[key][1020,1220,1], 63.96732 , rel_tol=1e-5) or \
            math.isclose(ds.variables[key][1020,1220,1], 64.00045 , rel_tol=1e-5) or \
            math.isclose(ds.variables[key][1020,1220,1], 64.135735, rel_tol=1e-5)):
@@ -214,14 +208,12 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
           modified = True
         elif math.isclose(ds.variables[key][1020,1220,1], 64.00045, rel_tol=1e-5):
          log.info('Replacing the longitude and latitude u-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
-        #print(warning_message, 'u', ds.variables[key][1020,1220,1], ' should be 250.52598571777344')
          if write:
           ds.variables[key][...]                 = lon_vertices_from_nemo_orca025_u_grid[...]  # Replacing the longitude vertices
           ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca025_u_grid[...]  # Replacing the latitude  vertices
           modified = True
         elif math.isclose(ds.variables[key][1020,1220,1], 64.135735, rel_tol=1e-5):
          log.info('Replacing the longitude and latitude v-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
-        #print(warning_message, 'v', ds.variables[key][1020,1220,1], ' should be 253.0')
          if write:
           ds.variables[key][...]                 = lon_vertices_from_nemo_orca025_v_grid[...]  # Replacing the longitude vertices
           ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca025_v_grid[...]  # Replacing the latitude  vertices
