@@ -58,24 +58,6 @@ lon_vertices_from_nemo_orca025_t_grid = np.where(lon_vertices_from_nemo_orca025_
 lon_vertices_from_nemo_orca025_u_grid = np.where(lon_vertices_from_nemo_orca025_u_grid < 0, lon_vertices_from_nemo_orca025_u_grid + 360.0, lon_vertices_from_nemo_orca025_u_grid)
 lon_vertices_from_nemo_orca025_v_grid = np.where(lon_vertices_from_nemo_orca025_v_grid < 0, lon_vertices_from_nemo_orca025_v_grid + 360.0, lon_vertices_from_nemo_orca025_v_grid)
 
-show_incorrect_selection_point_values = False
-if show_incorrect_selection_point_values:
- # Determine a distinguising point with which help we can distinguish the t, u and v grid (Needed for the vertices correction):
- # Load the vertices fields (Note these are global variables which otherwise have to be given as arguments via the function process_file to the function fix_file):
- lon_vertices_from_incorrect_cmorised_orca1_t_grid, lat_vertices_from_incorrect_cmorised_orca1_t_grid = load_vertices("incorrect-cmorised-vertices-ORCA1-t-grid.nc")
- lon_vertices_from_incorrect_cmorised_orca1_u_grid, lat_vertices_from_incorrect_cmorised_orca1_u_grid = load_vertices("incorrect-cmorised-vertices-ORCA1-u-grid.nc")
- lon_vertices_from_incorrect_cmorised_orca1_v_grid, lat_vertices_from_incorrect_cmorised_orca1_v_grid = load_vertices("incorrect-cmorised-vertices-ORCA1-v-grid.nc")
- print('lon vertex cmor t-grid for ORCA1: ', lon_vertices_from_incorrect_cmorised_orca1_t_grid[290,105,1])       # 250.39437866210938  this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
- print('lon vertex cmor u-grid for ORCA1: ', lon_vertices_from_incorrect_cmorised_orca1_u_grid[290,105,1])       # 250.52598571777344  this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
- print('lon vertex cmor v-grid for ORCA1: ', lon_vertices_from_incorrect_cmorised_orca1_v_grid[290,105,1])       # 253.0               this concerns the buggy cmorised data therefore this value is used to detect whether the data set is incorrect
- print('lon vertex nemo t-grid for ORCA1: ', lon_vertices_from_nemo_orca1_t_grid[290,105,1])                     # 247.78886
- print('lon vertex nemo u-grid for ORCA1: ', lon_vertices_from_nemo_orca1_u_grid[290,105,1])                     # 248.04973
- print('lon vertex nemo v-grid for ORCA1: ', lon_vertices_from_nemo_orca1_v_grid[290,105,1])                     # 250.40128
- print('lat vertex nemo t-grid for ORCA1: ', lat_vertices_from_nemo_orca1_t_grid[290,105,1])                     # 85.726585
- print('lat vertex nemo u-grid for ORCA1: ', lat_vertices_from_nemo_orca1_u_grid[290,105,1])                     # 85.51555
- print('lat vertex nemo v-grid for ORCA1: ', lat_vertices_from_nemo_orca1_v_grid[290,105,1])                     # 85.74064
- print('')
- sys.exit()
 
 def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
     ds = netCDF4.Dataset(path, "r+" if write else "r")
@@ -158,8 +140,8 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
       if ds.variables[key][...].shape == orca1_grid_shape:
        # In order to detect whether the cmorised file contains vertices which are not based on the NEMO data (and thus have the
        # dateline BUG in the longitude vertices), the values of a single ORCA1 vertices_longitude point [290,105,1] is checked.
-       # This point is selected because it has always different values for on the t-, u- and v-grid and for each staggered grid
-       # The value is different between the incorrect & corrected data:
+       # This point is selected (see the developer-scripts/vertices-checker.py script) because it has always different values on
+       # the t, u and v staggered grids and the value is different between the incorrect & corrected data for each of those:
        # Check on t-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 250.39437866210938 then it concerns the incorrect data.
        # Check on u-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 250.52598571777344 then it concerns the incorrect data.
        # Check on v-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 253.0              then it concerns the incorrect data.
@@ -191,8 +173,8 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
       if ds.variables[key][...].shape == orca025_grid_shape:
        # In order to detect whether the cmorised file contains vertices which are not based on the NEMO data (and thus have the
        # dateline BUG in the longitude vertices), the values of a single ORCA025 vertices_longitude point [1020,1220,1] is checked.
-       # This point is selected because it has always different values for on the t-, u- and v-grid and for each staggered grid
-       # The value is different between the incorrect & corrected data:
+       # This point is selected (see the developer-scripts/vertices-checker.py script) because it has always different values on
+       # the t, u and v staggered grids and the value is different between the incorrect & corrected data for each of those:
        # Check on t-grid for incorrect cmorised data: if ds.variables[key][1020,1220,1] equals 63.96732  then it concerns the incorrect data.
        # Check on u-grid for incorrect cmorised data: if ds.variables[key][1020,1220,1] equals 64.00045  then it concerns the incorrect data.
        # Check on v-grid for incorrect cmorised data: if ds.variables[key][1020,1220,1] equals 64.135735 then it concerns the incorrect data.
