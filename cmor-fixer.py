@@ -17,7 +17,7 @@ warning_message = '\n \033[93m' + 'Warning:' + '\033[0m'      # Yellow warning m
 
 # import datetime
 
-version = 'v2.3'
+version = 'v2.4'
 
 log = logging.getLogger(os.path.basename(__file__))
 
@@ -222,8 +222,10 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
     if modified:
         history = getattr(ds, "history", "")
         log.info("Appending message about modification to the history attribute.")
+        log.info("The latest applied cmor-fixer version attribute is set to: " + str(version))
         if write:
             setattr(ds, "history", history + 'The cmor-fixer version %s script has been applied.' % (version))
+            setattr(ds, "latest_applied_cmor_fixer_version", version)
     #    if modified:
     #        creation_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     #        log.info("Setting creation_dr(ate to %s for %s" % (creation_date, ds.filepath()))
