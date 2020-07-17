@@ -17,7 +17,7 @@ warning_message = '\n \033[93m' + 'Warning:' + '\033[0m'      # Yellow warning m
 
 # import datetime
 
-version = 'v2.4'
+version = 'v3.0'
 
 log = logging.getLogger(os.path.basename(__file__))
 
