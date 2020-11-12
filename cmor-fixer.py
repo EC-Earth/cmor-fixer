@@ -1,21 +1,62 @@
 #!/usr/bin/env python
 
+import sys
+import math
 import argparse
 import os
 import json
 import netCDF4
 import logging
 import uuid
+import numpy as np
 import multiprocessing
 from functools import partial
 
+error_message   = '\n \033[91m' + 'Error:'   + '\033[0m'      # Red    error   message
+warning_message = '\n \033[93m' + 'Warning:' + '\033[0m'      # Yellow warning message
+
 # import datetime
 
-version = 'v2.0'
+version = 'v3.0'
 
 log = logging.getLogger(os.path.basename(__file__))
 
 skipped_attributes = ["source", "comment"]
+
+# The vertices fields on an ORCA1 grid have the following dimension sizes (used to check whether the considered grid is ORCA1):
+orca1_grid_shape   = ( 292,  362, 4)
+orca025_grid_shape = (1050, 1442, 4)
+
+
+def load_vertices(vertices_file_name):
+    # Loading once at the start the NEMO longitude and latitude vertices from a netcdf file:
+    nemo_vertices_file_name=os.path.join("nemo-vertices", vertices_file_name)
+    if os.path.isfile(nemo_vertices_file_name) == False: print(error_message, ' The netcdf data file ', nemo_vertices_file_name, '  does not exist.\n'); sys.exit()
+    nemo_vertices_netcdf_file = netCDF4.Dataset(nemo_vertices_file_name, 'r')
+    lon_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_longitude"]
+    lat_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_latitude"]
+    lon_vertices_from_nemo = np.array(lon_vertices_from_nemo_tmp[...], copy=True)
+    lat_vertices_from_nemo = np.array(lat_vertices_from_nemo_tmp[...], copy=True)
+    nemo_vertices_netcdf_file.close()
+    return lon_vertices_from_nemo, lat_vertices_from_nemo
+
+# Load the vertices fields (Note these are global variables which otherwise have to be given as arguments via the function process_file to the function fix_file):
+lon_vertices_from_nemo_orca1_t_grid, lat_vertices_from_nemo_orca1_t_grid = load_vertices("nemo-vertices-ORCA1-t-grid.nc")
+lon_vertices_from_nemo_orca1_u_grid, lat_vertices_from_nemo_orca1_u_grid = load_vertices("nemo-vertices-ORCA1-u-grid.nc")
+lon_vertices_from_nemo_orca1_v_grid, lat_vertices_from_nemo_orca1_v_grid = load_vertices("nemo-vertices-ORCA1-v-grid.nc")
+# Convert the vertices_longitude to the 0-360 degree interval:
+lon_vertices_from_nemo_orca1_t_grid = np.where(lon_vertices_from_nemo_orca1_t_grid < 0, lon_vertices_from_nemo_orca1_t_grid + 360.0, lon_vertices_from_nemo_orca1_t_grid)
+lon_vertices_from_nemo_orca1_u_grid = np.where(lon_vertices_from_nemo_orca1_u_grid < 0, lon_vertices_from_nemo_orca1_u_grid + 360.0, lon_vertices_from_nemo_orca1_u_grid)
+lon_vertices_from_nemo_orca1_v_grid = np.where(lon_vertices_from_nemo_orca1_v_grid < 0, lon_vertices_from_nemo_orca1_v_grid + 360.0, lon_vertices_from_nemo_orca1_v_grid)
+
+# Load the vertices fields (Note these are global variables which otherwise have to be given as arguments via the function process_file to the function fix_file):
+lon_vertices_from_nemo_orca025_t_grid, lat_vertices_from_nemo_orca025_t_grid = load_vertices("nemo-vertices-ORCA025-t-grid.nc")
+lon_vertices_from_nemo_orca025_u_grid, lat_vertices_from_nemo_orca025_u_grid = load_vertices("nemo-vertices-ORCA025-u-grid.nc")
+lon_vertices_from_nemo_orca025_v_grid, lat_vertices_from_nemo_orca025_v_grid = load_vertices("nemo-vertices-ORCA025-v-grid.nc")
+# Convert the vertices_longitude to the 0-360 degree interval:
+lon_vertices_from_nemo_orca025_t_grid = np.where(lon_vertices_from_nemo_orca025_t_grid < 0, lon_vertices_from_nemo_orca025_t_grid + 360.0, lon_vertices_from_nemo_orca025_t_grid)
+lon_vertices_from_nemo_orca025_u_grid = np.where(lon_vertices_from_nemo_orca025_u_grid < 0, lon_vertices_from_nemo_orca025_u_grid + 360.0, lon_vertices_from_nemo_orca025_u_grid)
+lon_vertices_from_nemo_orca025_v_grid = np.where(lon_vertices_from_nemo_orca025_v_grid < 0, lon_vertices_from_nemo_orca025_v_grid + 360.0, lon_vertices_from_nemo_orca025_v_grid)
 
 
 def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
@@ -60,6 +101,108 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
                             ds.variables[bndvarname][...] -= shift
                         modified = True
                         shifted_vars.add(bndvarname)
+
+    # Correcting siconca: convert from fraction to percentage. See ece2cmor3 issue 627:
+    # https://github.com/EC-Earth/ece2cmor3/issues/627
+    for key in ds.variables:
+    #if key == "siconca" and getattr(ds, "grid_label") == "gr":
+     if key == "siconca":
+      # Check whether no value is larger than 1: In that case it is very liekly that the field is a fraction
+      # between 0 and 1 instead of a percentage. Therefore we will convert it:
+      if not (ds.variables[key][...] > 1).any():
+       log.info('Convert a fraction to a percentage by multiplying by a factor 100 for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+       if write:
+        ds.variables[key][...] = 100.0 * ds.variables[key][...] # Convert the fraction to a percentage
+        modified = True
+
+    # Correcting evspsbl: convert from fraction to percentage. See EC-Earth portal issue 768-13:
+    # https://dev.ec-earth.org/issues/768#note-13
+    for key in ds.variables:
+    #if key == "evspsbl" and getattr(ds, "grid_label") == "gr":
+     if key == "evspsbl":
+      # Check the ratio of total positive and negative field values: if the number of positive field values
+      # is smaller than the number of negative values, then the sign will be flipped:
+     #print('ratio = ', np.count_nonzero(ds.variables[key][...] > 0) / np.count_nonzero(ds.variables[key][...] < 0))
+      if np.count_nonzero(ds.variables[key][...] > 0) < np.count_nonzero(ds.variables[key][...] < 0):
+       log.info('Flip the sign of the entire field by multiplying by a factor -1 for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+       if write:
+        ds.variables[key][...] = -1.0 * ds.variables[key][...] # Flip the sign of the field values
+        modified = True
+
+    # Correcting vertices_longitude and vertices_latitude. See ece2cmor3 issue 625:
+    # https://github.com/EC-Earth/ece2cmor3/issues/625
+    for key in ds.variables:
+     if key == "vertices_longitude" and getattr(ds, "grid_label") == "gn":
+      if ds.variables[key][...].shape != orca1_grid_shape and ds.variables[key][...].shape != orca025_grid_shape:
+       print(warning_message, 'The cmor-fixer currently only supports the vertices fix for the ORCA1 & ORCA025 grid. Here a different grid size is detected: ', ds.variables[key][...].shape, '\n')
+       break
+      # Check and veritces fix for the ORCA1 grid:
+      if ds.variables[key][...].shape == orca1_grid_shape:
+       # In order to detect whether the cmorised file contains vertices which are not based on the NEMO data (and thus have the
+       # dateline BUG in the longitude vertices), the values of a single ORCA1 vertices_longitude point [290,105,1] is checked.
+       # This point is selected (see the developer-scripts/vertices-checker.py script) because it has always different values on
+       # the t, u and v staggered grids and the value is different between the incorrect & corrected data for each of those:
+       # Check on t-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 250.39437866210938 then it concerns the incorrect data.
+       # Check on u-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 250.52598571777344 then it concerns the incorrect data.
+       # Check on v-grid for incorrect cmorised data: if ds.variables[key][290,105,1] equals 253.0              then it concerns the incorrect data.
+       # Note that based on this detection of the vertices_longitude, both the vertices_longitude & vertices_latitude are changed.
+       if (math.isclose(ds.variables[key][290,105,1], 250.39437866210938, rel_tol=1e-5) or \
+           math.isclose(ds.variables[key][290,105,1], 250.52598571777344, rel_tol=1e-5) or \
+           math.isclose(ds.variables[key][290,105,1], 253.0             , rel_tol=1e-5)):
+        if   math.isclose(ds.variables[key][290,105,1], 250.39437866210938, rel_tol=1e-5):
+         log.info('Replacing the longitude and latitude t-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+         if write:
+          ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_t_grid[...]  # Replacing the longitude vertices
+          ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_t_grid[...]  # Replacing the latitude  vertices
+          modified = True
+        elif math.isclose(ds.variables[key][290,105,1], 250.52598571777344, rel_tol=1e-5):
+         log.info('Replacing the longitude and latitude u-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+         if write:
+          ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_u_grid[...]  # Replacing the longitude vertices
+          ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_u_grid[...]  # Replacing the latitude  vertices
+          modified = True
+        elif math.isclose(ds.variables[key][290,105,1], 253.0, rel_tol=1e-5):
+         log.info('Replacing the longitude and latitude v-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+         if write:
+          ds.variables[key][...]                 = lon_vertices_from_nemo_orca1_v_grid[...]  # Replacing the longitude vertices
+          ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_v_grid[...]  # Replacing the latitude  vertices
+          modified = True
+        else:
+         print(error_message, ' The cmor-fixer failed to determine the staggered grid in the procedure to fix the NEMO vertices. \n'); sys.exit()
+      # Check and veritces fix for the ORCA025 grid:
+      if ds.variables[key][...].shape == orca025_grid_shape:
+       # In order to detect whether the cmorised file contains vertices which are not based on the NEMO data (and thus have the
+       # dateline BUG in the longitude vertices), the values of a single ORCA025 vertices_longitude point [1020,1220,1] is checked.
+       # This point is selected (see the developer-scripts/vertices-checker.py script) because it has always different values on
+       # the t, u and v staggered grids and the value is different between the incorrect & corrected data for each of those:
+       # Check on t-grid for incorrect cmorised data: if ds.variables[key][1020,1220,1] equals 63.96732  then it concerns the incorrect data.
+       # Check on u-grid for incorrect cmorised data: if ds.variables[key][1020,1220,1] equals 64.00045  then it concerns the incorrect data.
+       # Check on v-grid for incorrect cmorised data: if ds.variables[key][1020,1220,1] equals 64.135735 then it concerns the incorrect data.
+       # Note that based on this detection of the vertices_longitude, both the vertices_longitude & vertices_latitude are changed.
+       if (math.isclose(ds.variables[key][1020,1220,1], 63.96732 , rel_tol=1e-5) or \
+           math.isclose(ds.variables[key][1020,1220,1], 64.00045 , rel_tol=1e-5) or \
+           math.isclose(ds.variables[key][1020,1220,1], 64.135735, rel_tol=1e-5)):
+        if   math.isclose(ds.variables[key][1020,1220,1], 63.96732, rel_tol=1e-5):
+         log.info('Replacing the longitude and latitude t-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+         if write:
+          ds.variables[key][...]                 = lon_vertices_from_nemo_orca025_t_grid[...]  # Replacing the longitude vertices
+          ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca025_t_grid[...]  # Replacing the latitude  vertices
+          modified = True
+        elif math.isclose(ds.variables[key][1020,1220,1], 64.00045, rel_tol=1e-5):
+         log.info('Replacing the longitude and latitude u-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+         if write:
+          ds.variables[key][...]                 = lon_vertices_from_nemo_orca025_u_grid[...]  # Replacing the longitude vertices
+          ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca025_u_grid[...]  # Replacing the latitude  vertices
+          modified = True
+        elif math.isclose(ds.variables[key][1020,1220,1], 64.135735, rel_tol=1e-5):
+         log.info('Replacing the longitude and latitude v-grid vertices for %s (%s) in %s' % (key, getattr(ds.variables[key], "standard_name", "none"), ds.filepath()))
+         if write:
+          ds.variables[key][...]                 = lon_vertices_from_nemo_orca025_v_grid[...]  # Replacing the longitude vertices
+          ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca025_v_grid[...]  # Replacing the latitude  vertices
+          modified = True
+        else:
+         print(error_message, ' The cmor-fixer failed to determine the staggered grid in the procedure to fix the NEMO vertices. \n'); sys.exit()
+
     if metadata is not None:
         for key, val in metadata.items():
             attname, attval = str(key), val
@@ -79,8 +222,10 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
     if modified:
         history = getattr(ds, "history", "")
         log.info("Appending message about modification to the history attribute.")
+        log.info("The latest applied cmor-fixer version attribute is set to: " + str(version))
         if write:
             setattr(ds, "history", history + 'The cmor-fixer version %s script has been applied.' % (version))
+            setattr(ds, "latest_applied_cmor_fixer_version", version)
     #    if modified:
     #        creation_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     #        log.info("Setting creation_dr(ate to %s for %s" % (creation_date, ds.filepath()))
@@ -174,24 +319,20 @@ def main(args=None):
         ofile = open(ofilename, 'w') if args.olist else None
         worker = partial(process_file, flog=ofile, write=not args.dry, keepid=args.keepid, forceid=args.forceid,
                          metadata=metadata, add_attributes=args.addattrs)
-        for root, dirs, files in os.walk(odir):
+        for root, dirs, files in os.walk(odir, followlinks=False):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
-                    if filepath.endswith(".nc"):
-                        candidatefile = os.path.join(root,filepath)
-                        if os.path.islink(candidatefile):
-                            continue
-                        worker(os.path.join(root, filepath))
+                    fullpath = os.path.join(root, filepath)
+                    if not os.path.islink(fullpath) and filepath.endswith(".nc"):
+                        worker(fullpath)
     else:
         considered_files = []
-        for root, dirs, files in os.walk(odir):
+        for root, dirs, files in os.walk(odir, followlinks=False):
             if depth is None or root[len(odir):].count(os.sep) < int(depth):
                 for filepath in files:
-                    if filepath.endswith(".nc"):
-                        candidatefile = os.path.join(root,filepath)
-                        if os.path.islink(candidatefile):
-                            continue
-                        considered_files.append(os.path.join(root, filepath))
+                    fullpath = os.path.join(root, filepath)
+                    if not os.path.islink(fullpath) and filepath.endswith(".nc"):
+                        considered_files.append(fullpath)
         manager = multiprocessing.Manager()
         fq = manager.Queue()
         pool = multiprocessing.Pool(processes=args.npp)
