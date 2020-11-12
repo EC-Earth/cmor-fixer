@@ -30,7 +30,9 @@ orca025_grid_shape = (1050, 1442, 4)
 
 def load_vertices(vertices_file_name):
     # Loading once at the start the NEMO longitude and latitude vertices from a netcdf file:
-    nemo_vertices_file_name=os.path.join("nemo-vertices", vertices_file_name)
+    scriptdir=os.path.dirname(__file__)
+    nemoverticespath=scriptdir+"/nemo-vertices"
+    nemo_vertices_file_name=os.path.join(nemoverticespath, vertices_file_name)
     if os.path.isfile(nemo_vertices_file_name) == False: print(error_message, ' The netcdf data file ', nemo_vertices_file_name, '  does not exist.\n'); sys.exit()
     nemo_vertices_netcdf_file = netCDF4.Dataset(nemo_vertices_file_name, 'r')
     lon_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_longitude"]
@@ -280,6 +282,8 @@ def main(args=None):
                              "file will be skipped unless the --addatts option is used.")
     parser.add_argument("--olist", "-o", action="store_true", default=False,
                         help="Write list-of-modified-files.txt listing all modified files")
+    parser.add_argument("--output-dir", default=None, type=str,
+                        help="alternate directory to write output file to (optional)")
     parser.add_argument("--addattrs", "-a", action="store_true", default=False,
                         help="Add new attributes from metadata file")
     parser.add_argument("--npp", type=int, default=1, help="Number of sub-processes to launch (default 1)")
@@ -295,6 +299,11 @@ def main(args=None):
         log.error("Options keepid and forceid are mutually exclusive, please choose either one.")
         return
     odir = args.datadir
+    outputdir=args.output_dir
+    if not outputdir == None:
+        if not os.path.isdir(outputdir):
+            log.error("Invalid output directory %s. Skipping run." % outputdir)
+            return
     depth = getattr(args, "depth", None)
     metajson = getattr(args, "meta", None)
     metadata = None
@@ -308,11 +317,15 @@ def main(args=None):
         log.error("Invalid number of subprocesses chosen, please pick a number > 0")
         return
     ofilename = "list-of-modified-files.txt"
+    if not outputdir == None:
+        ofilename="%s/%s"%(outputdir,ofilename)
     if args.olist and os.path.isfile(ofilename):
         i = 1
         while os.path.isfile(ofilename):
             i += 1
             newfilename = "list-of-modified-files-" + str(i) + ".txt"
+            if not outputdir == None:
+                newfilename="%s/list-of-modified-files-"%(outputdir)+str(i)+".txt"
             log.warning("Output file name %s already exists, trying %s..." % (ofilename, newfilename))
             ofilename = newfilename
     if args.npp == 1:
