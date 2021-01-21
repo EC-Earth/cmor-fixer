@@ -324,6 +324,8 @@ def main(args=None):
         while os.path.isfile(ofilename):
             i += 1
             newfilename = "list-of-modified-files-" + str(i) + ".txt"
+            if not outputdir == None:
+                newfilename="%s/list-of-modified-files-"+str(i)+".txt"%(outputdir)
             log.warning("Output file name %s already exists, trying %s..." % (ofilename, newfilename))
             ofilename = newfilename
     if args.npp == 1:
