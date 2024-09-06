@@ -49,7 +49,7 @@ Download [mamba](https://github.com/conda-forge/miniforge/releases/latest/) by u
 
 For example we create the directoy ${HOME}/cmorize/ for the cmor-fixer:
 ```shell
-git clone https://github.com/EC-Earth/cmor-fixer.git
+git clone git@github.com:EC-Earth/cmor-fixer.git
 ```
 
 ##### Creating a conda environment and installing cmor-fixer therein:
