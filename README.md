@@ -1,5 +1,5 @@
 # cmor-fixer
-On-site fixer script for cmorized data
+On-site fixer script for cmorized EC-Earth3 data.
 
 Python code to fix the incorrect longitude eastward shift of half a grid cell by `ece2cmor`, see [ece2cmor issue 553](https://github.com/EC-Earth/ece2cmor3/issues/553).
 
@@ -14,43 +14,52 @@ Issue [731](https://dev.ec-earth.org/issues/731) at the EC-Earth portal is dedic
 
 ## 1. Installation
 
+#### Installation & running with Mamba (strongly recommended):
+With the `Mamba` package manager all the python packages can be installed within one go. For instance, this is certainly beneficial at HPC systems where permissions to install complementary python packages to the default python distribution are lacking.
 
-#### Installation with miniconda3:
-The Miniconda python distribution should be installed. With miniconda all the packages can be installed within one go by the package manager `conda`. This applies also to systems where one is not allowed to install complementary python packages to the default python distribution.
+##### Define a mambapath & two aliases
 
-##### If Miniconda3 is not yet installed:
-
-Download [miniconda](https://repo.continuum.io/miniconda/) (e.g. take the latest miniconda version for python 3) by using `wget` and install with `bash`:
+First, define a `mambapath` and two aliases in a `.bashrc` file for later use:
  ```shell
- mkdir -p Downloads; cd Downloads/
- wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
- bash Miniconda3-latest-Linux-x86_64.sh -b -u -p /$HOME/miniconda3  #  for instance on your laptop
- bash Miniconda3-latest-Linux-x86_64.sh -b -u -p /$PERM/miniconda3  #  for instance on cca, because on $PERM the disk space is sufficient, which is on cca not the case for $HOME.
-
+ mambapath=${HOME}/mamba/
+ alias activatemamba='source ${mambapath}/etc/profile.d/conda.sh'
+ alias activatecmorfixer='activatemamba; conda activate cmorfixer'
  ```
-One could consider to add the following variable definition and alias in the `.bashrc` file:
+
+##### If Mamba is not yet installed:
+
+Download [mamba](https://github.com/conda-forge/miniforge/releases/latest/) by using `wget` and install it via the commandline with `bash`:
  ```shell
- miniconda3path=${HOME}/miniconda3/                                 #  for instance on your laptop
- miniconda3path=${PERM}/miniconda3/                                 #  for instance on cca
+ # Check whether mambapath is set:
+ echo ${mambapath}
+ # Create a backup of an eventual mamba install (and environments) to prevent an accidental overwrite:
+ if [ -d ${mambapath} ]; then backup_label=backup-`date +%d-%m-%Y`; mv -f  ${mambapath} ${mambapath/mamba/mamba-${backup_label}}; fi
  
- alias activateminiconda3='source ${miniconda3path}/etc/profile.d/conda.sh'
+ # Download & install mamba:
+ mkdir -p ${HOME}/Downloads; cd ${HOME}/Downloads/
+ wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh"
+ bash Mambaforge-$(uname)-$(uname -m).sh -b -u -p ${mambapath}
+ 
+ # Update mamba:
+ activatemamba
+ mamba update -y --name base mamba
  ```
 
 ##### Download cmor-fixer by a git checkout
 
 For example we create the directoy ${HOME}/cmorize/ for the cmor-fixer:
-
 ```shell
 git clone https://github.com/EC-Earth/cmor-fixer.git
 ```
 
 ##### Creating a conda environment and installing cmor-fixer therein:
-In the cmor-fixer git checkout directory, type
+
 ```shell
-activateminiconda3                         # The alias as defined above
-conda update -y -n base -c defaults conda  # for updating conda itself
-cd cmor-fixer
-conda env create -f environment.yml        # for linux & mac os
+activatemamba                             # The mamba-activate alias (as defined above)
+cd ${HOME}/cmorize/cmor-fixer             # Navigate to the cmor-fixer root directory
+mamba env create -f environment.yml       # Create the python environment (for linux & mac os)
+conda activate cmorfixer                  # Here conda is still used instead of mamba
+conda deactivate                          # Deactivating the active (here cmorfixer) environment
 ```
 
 ## 2. Run cmor-fixer
@@ -61,17 +70,16 @@ conda env create -f environment.yml        # for linux & mac os
 ```shell
 
  # Activate the cmor-fixer conda environment:
- activateminiconda3                        # The alias as defined above
- conda activate cmorfixer
+ activatecmorfixer                         # The alias as defined above
  
- # The help of cmor-fixer list its argument options:
+ # Run the help of the cmor-fixer, it lists its argument options:
  ./cmor-fixer.py -h
  
  # A dry-run example which, due to the --forceid option, will give a new tracking id to any file
  # encountered including files with correct lon data:
  ./cmor-fixer.py --verbose --forceid --olist --npp 1 --dry CMIP6/
  
- conda deactivate
+ conda deactivate                          # Deactivating the active (here cmorfixer) environment
 ```
 
 ### Apply cmor-fixer at the ESGF node to data which has been published at the ESGF node
@@ -82,8 +90,9 @@ conda env create -f environment.yml        # for linux & mac os
 ```shell
 
  # Activate the cmor-fixer conda environment:
- activateminiconda3                        # The alias as defined above
- conda activate cmorfixer
+ activatecmorfixer                         # The mamba-activate alias (as defined above)
+ cd ${HOME}/cmorize/cmor-fixer             # Navigate to the cmor-fixer root directory
+ conda deactivate                          # Deactivating the active (here cmorfixer) environment
 
  # An example in which cmor fixer is applying the lon & lon_bnds fix to the data:
  ./cmor-fixer.py --verbose --forceid --olist --npp 1 CMIP6/
@@ -96,9 +105,8 @@ conda env create -f environment.yml        # for linux & mac os
 The `cmor-fixer-save-mode-wrapper.sh` script will only apply changes if at least one file with one error is detected in the entire dataset. In case an error is detected and the script will continue to apply changes, additional checks will be applied to check for interuptions during running the script.
 ```
  # Activate the cmor-fixer conda environment:
- activateminiconda3                        # The alias as defined above
- conda activate cmorfixer
- 
+ activatecmorfixer                         # The mamba-activate alias (as defined above)
+  
  ./cmor-fixer-save-mode-wrapper.sh 1 CMIP6/
  
  conda deactivate
@@ -116,9 +124,8 @@ sbatch submit-cmor-fixer.sh
 ```shell
 
  # Activate the cmor-fixer conda environment:
- activateminiconda3                        # The alias as defined above
- conda activate cmorfixer
-
+ activatecmorfixer                         # The mamba-activate alias (as defined above)
+ 
  # An example in which cmor fixer is applying the lon & lon_bnds fix to the data:
  ./cmor-fixer.py --verbose --keepid --olist --npp 1 CMIP6/
  
@@ -151,9 +158,9 @@ If so (this happens when during running the script the date changed because you 
 #### Run `nctime` which checks whether the metadata doesn't show time gaps (due to glitches):
 ```
 conda deactivate                     # Leaving the cmorfixer environment due to trouble with installing nctime
-activateminiconda3                   # Only needed when not done before (doesn't harm to do it twice)
+activatemamba                        # Only needed when not done before (doesn't harm to do it twice)
 cd nctime/
-./run-nctime-for-cmip6.sh CMIP6      # This will install nctime directly in the miniconda3 environment en run it
+./run-nctime-for-cmip6.sh CMIP6      # This will install nctime directly in the mamba environment en run it
 ```
 
 ## 5. Check the longitude-shift fix itself
