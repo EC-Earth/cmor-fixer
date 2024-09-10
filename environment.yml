@@ -1,17 +1,15 @@
 # For developers only:
-#  Remove the cmorfixer environment and clean the downloaded conda cache:
+#  Remove the cmorfixer environment:
 #   conda deactivate
-#   conda env remove -y -n cmorfixer
-#   conda clean --all -y
+#   rm -rf ${mambapath}/envs/cmorfixer
 #  Create the cmorfixer environment:
-#   conda update -n base -c defaults conda        # For updating conda itself if you like
-#   conda env create -f environment.yml
+#    activatemamba                               # alias activatemamba='source ${mambapath}/etc/profile.d/conda.sh'
+#    mamba update -y --name base mamba           # For updating mamba itself
+#    mamba env create -f environment.yml         # Create the cmorfixer environment
 #  Basic tests:
+#   which python                                 # ${mambapath}/envs/cmorfixer/bin/python
+#   python --version                             # Python 3.12.5
 #   ./cmor-fixer.py -h
-#  Miscelaneous relevant help commands:
-#   conda env list
-#   conda list
-#   conda update --all
 
 name: cmorfixer
 channels:
