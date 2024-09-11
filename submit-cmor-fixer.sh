@@ -1,19 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
-# Run this script by:
-#  sbatch submit-cmor-fixer.sh
+# This script runs without arguments.
 #
-# Fix the longitude eastward shift in the EC-Earth3 cmorisation.
+# Fix EC-Earth3 errors in cmorised data like the longitude eastward shift.
+# It is safe to run the script on correct or corrected data.
 #
 # This scripts requires no arguments.
 #
-#SBATCH --job-name=cmor-fixer
-#SBATCH --partition=all
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=28
-#SBATCH --account=proj-cmip6
 
-# Two account options:  proj-cmip6  &  model-testing
+#SBATCH --time=00:05:00
+#SBATCH --job-name=cmorfixer
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=128
+#SBATCH --qos=nf
+#SBATCH --output=stdout-cmorisation.%j.out
+#SBATCH --error=stderr-cmorisation.%j.out
+#SBATCH --account=nlchekli
+#SBATCH --mail-type=FAIL
 
 # CMORISEDDIR is the directory with the cmorised data
 # METADATA    is the name of the meta data file, for instance: ece2cmor3/resources/metadata-templates/cmip6-CMIP-piControl-metadata-template.json
@@ -30,7 +33,7 @@
 
    if [ -z "$CMORISEDDIR" ]; then echo "Error: Empty EC-Earth3 data output directory: " $CMORISEDDIR ", aborting" $0 >&2; exit 1; fi
 
-   source /lustre2/projects/model_testing/reerink/miniconda3/etc/profile.d/conda.sh
+   source ${PERM}/mamba/etc/profile.d/conda.sh
    conda activate cmorfixer
 
    export HDF5_USE_FILE_LOCKING=FALSE
@@ -38,16 +41,20 @@
    ./cmor-fixer.py --verbose               \
                    --forceid               \
                    --olist                 \
-                   --npp         28        \
+                   --npp         128       \
                    $CMORISEDDIR
 
-                  #--dry                   \
-                  #--keepid                \
-                  #--meta        $METADATA \
+#  ./cmor-fixer.py --verbose               \
+#                  --dry                   \
+#                  --keepid                \
+#                  --meta        $METADATA \
+#                  --olist                 \
+#                  --npp         128       \
+#                  $CMORISEDDIR
 
  else
   echo
-  echo '  Illegal number of arguments: the script requires no arguments, for instance:'
-  echo '   sbatch ' $0
+  echo "  Illegal number of arguments: this script itself requires no arguments. Thus run:"
+  echo "   sbatch  $0"
   echo
  fi
