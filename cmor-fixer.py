@@ -9,15 +9,14 @@ import netCDF4
 import logging
 import uuid
 import numpy as np
+import datetime
 import multiprocessing
 from functools import partial
 
+version_cmorfixer = 'v3.0'
+
 error_message   = '\n \033[91m' + 'Error:'   + '\033[0m'      # Red    error   message
 warning_message = '\n \033[93m' + 'Warning:' + '\033[0m'      # Yellow warning message
-
-# import datetime
-
-version = 'v3.0'
 
 log = logging.getLogger(os.path.basename(__file__))
 
@@ -222,15 +221,10 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
     if modified:
         history = getattr(ds, "history", "")
         log.info("Appending message about modification to the history attribute.")
-        log.info("The latest applied cmor-fixer version attribute is set to: " + str(version))
+        log.info("The latest applied cmor-fixer version attribute is set to: " + str(version_cmorfixer))
         if write:
-            setattr(ds, "history", history + 'The cmor-fixer version %s script has been applied.' % (version))
-            setattr(ds, "latest_applied_cmor_fixer_version", version)
-    #    if modified:
-    #        creation_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    #        log.info("Setting creation_dr(ate to %s for %s" % (creation_date, ds.filepath()))
-    #        if write:
-    #            setattr(ds, "creation_date", creation_date)
+            setattr(ds, "latest_applied_cmor_fixer_version", version_cmorfixer)
+            setattr(ds, "history", history + 'The cmor-fixer version %s script has been applied.' % (version_cmorfixer))
     ds.close()
     return modified
 
@@ -262,6 +256,7 @@ def listener(q, fname):
 def main(args=None):
     if args is None:
         pass
+    ofilename = "list-of-modified-files-1.txt"
     formatter = lambda prog: argparse.HelpFormatter(prog,max_help_position=30)
     parser = argparse.ArgumentParser(description="Fix longitude coordinate (and opt. attributes) in cmorized files", formatter_class=formatter)
     parser.add_argument("datadir", metavar="DIR", type=str, help="Directory containing cmorized files")
@@ -279,43 +274,58 @@ def main(args=None):
                              "**ALL** netcdf files found recursively in your data directory. New attributes in this "
                              "file will be skipped unless the --addatts option is used.")
     parser.add_argument("--olist", "-o", action="store_true", default=False,
-                        help="Write list-of-modified-files.txt listing all modified files")
+                        help="Write " + ofilename + " listing all modified files")
     parser.add_argument("--addattrs", "-a", action="store_true", default=False,
                         help="Add new attributes from metadata file")
     parser.add_argument("--npp", type=int, default=1, help="Number of sub-processes to launch (default 1)")
 
     args = parser.parse_args()
+
+    # Obligatory argument:
+    odir = args.datadir
+    if not os.path.isdir(odir):
+        log.error("Data directory argument %s is not a valid directory: Skipping fix" % odir)
+        return
+
+    # Optional arguments:
+    # depth:
+    depth = getattr(args, "depth", None)
+    # verbose:
     logformat = "%(asctime)s %(levelname)s:%(name)s: %(message)s"
     logdateformat = "%Y-%m-%d %H:%M:%S"
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG, format=logformat, datefmt=logdateformat)
     else:
         logging.basicConfig(level=logging.WARNING, format=logformat, datefmt=logdateformat)
+    # keepid & forceid:
     if args.keepid and args.forceid:
-        log.error("Options keepid and forceid are mutually exclusive, please choose either one.")
+        log.error("Options keepid and forceid are mutually exclusive, please choose either the one or the other.")
         return
-    odir = args.datadir
-    depth = getattr(args, "depth", None)
+    # metadata:
     metajson = getattr(args, "meta", None)
+    if not os.path.isfile(metajson):
+        log.error("The metadata json file argument %s is not a valid file: Skipping the metadata modification." % metajson)
+        return
     metadata = None
     if metajson is not None:
         with open(metajson) as jsonfile:
             metadata = json.load(jsonfile)
-    if not os.path.isdir(odir):
-        log.error("Data directory argument %s is not a valid directory: skipping fix" % odir)
+    # npp:
+    npp=args.npp
+    if npp < 1 or npp > 128:
+        log.error("Invalid number of subprocesses chosen, please pick a number in the range: 1 - 128")
         return
-    if args.npp < 1:
-        log.error("Invalid number of subprocesses chosen, please pick a number > 0")
-        return
-    ofilename = "list-of-modified-files.txt"
+    # olist (list-of-modified-files):
     if args.olist and os.path.isfile(ofilename):
         i = 1
         while os.path.isfile(ofilename):
             i += 1
             newfilename = "list-of-modified-files-" + str(i) + ".txt"
-            log.warning("Output file name %s already exists, trying %s..." % (ofilename, newfilename))
+            log.warning("Output file name %s already exists, trying %s" % (ofilename, newfilename))
             ofilename = newfilename
-    if args.npp == 1:
+
+    # Sequential or parallel call:
+    if npp == 1:
         ofile = open(ofilename, 'w') if args.olist else None
         worker = partial(process_file, flog=ofile, write=not args.dry, keepid=args.keepid, forceid=args.forceid,
                          metadata=metadata, add_attributes=args.addattrs)
@@ -335,12 +345,11 @@ def main(args=None):
                         considered_files.append(fullpath)
         manager = multiprocessing.Manager()
         fq = manager.Queue()
-        pool = multiprocessing.Pool(processes=args.npp)
-        watcher = pool.apply_async(listener, (fq, ofilename))
+        pool = multiprocessing.Pool(processes=npp)
+        watcher = pool.apply_async(func=listener, args=(fq, ofilename))
         jobs = []
         for f in considered_files:
-            job = pool.apply_async(process_file, (f, fq, not args.dry, args.keepid, args.forceid, metadata,
-                                                  args.addattrs))
+            job = pool.apply_async(func=process_file, args=(f, fq, not args.dry, args.keepid, args.forceid, metadata, args.addattrs))
             jobs.append(job)
         for job in jobs:
             job.get()
