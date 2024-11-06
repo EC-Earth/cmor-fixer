@@ -313,7 +313,7 @@ def main(args=None):
         return
     # metadata:
     metajson = getattr(args, "meta", None)
-    if not os.path.isfile(metajson):
+    if metajson is not None and not os.path.isfile(metajson):
         log.error("The metadata json file argument %s is not a valid file: Skipping the metadata modification." % metajson)
         return
     metadata = None
