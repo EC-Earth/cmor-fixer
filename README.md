@@ -77,7 +77,7 @@ conda deactivate                          # Deactivating the active (here cmorfi
  
  # A dry-run example which, due to the --forceid option, will give a new tracking id to any file
  # encountered including files with correct lon data:
- ./cmor-fixer.py --verbose --forceid --olist --npp 1 --dry CMIP6/
+ ./cmor-fixer.py --verbose --forceid --olist log-dir --npp 1 --dry CMIP6/
  
  conda deactivate                          # Deactivating the active (here cmorfixer) environment
 ```
@@ -95,7 +95,7 @@ conda deactivate                          # Deactivating the active (here cmorfi
  conda deactivate                          # Deactivating the active (here cmorfixer) environment
 
  # An example in which cmor fixer is applying the lon & lon_bnds fix to the data:
- ./cmor-fixer.py --verbose --forceid --olist --npp 1 CMIP6/
+ ./cmor-fixer.py --verbose --forceid --olist log-dir --npp 1 CMIP6/
  
  conda deactivate
 ```
@@ -127,7 +127,7 @@ sbatch submit-cmor-fixer.sh
  activatecmorfixer                         # The mamba-activate alias (as defined above)
  
  # An example in which cmor fixer is applying the lon & lon_bnds fix to the data:
- ./cmor-fixer.py --verbose --keepid --olist --npp 1 CMIP6/
+ ./cmor-fixer.py --verbose --keepid --olist log-dir --npp 1 CMIP6/
  
  conda deactivate
 ```

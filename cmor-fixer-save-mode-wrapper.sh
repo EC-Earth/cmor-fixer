@@ -21,11 +21,19 @@ if [ "$#" -eq 2 ]; then
    number_of_cores=$1
    dir_with_cmorised_data=$2
 
-   olist_1_filename='list-of-modified-files.txt'
-   olist_2_filename='list-of-modified-files-2.txt'
-   olist_3_filename='list-of-modified-files-3.txt'
-   olist_4_filename='list-of-modified-files-4.txt'
-   diff_olists='diff-list-of-modified-files.txt'
+
+   logdir='log-dir'
+   mkdir -p ${logdir}
+   olist_1_filename=${logdir}/'list-of-modified-files-1.txt'
+   olist_2_filename=${logdir}/'list-of-modified-files-2.txt'
+   olist_3_filename=${logdir}/'list-of-modified-files-3.txt'
+   olist_4_filename=${logdir}/'list-of-modified-files-4.txt'
+   diff_olists=${logdir}/'diff-list-of-modified-files.txt'
+
+   log_1_filename=${logdir}/'cmor-fixer-messages-1.log'
+   log_2_filename=${logdir}/'cmor-fixer-messages-2.log'
+   log_3_filename=${logdir}/'cmor-fixer-messages-3.log'
+   log_4_filename=${logdir}/'cmor-fixer-messages-4.log'
 
    if [[ -e ${olist_1_filename} || -e ${olist_2_filename} || -e ${olist_3_filename} || -e ${olist_4_filename} || -e ${diff_olists} ]] ; then
     echo
@@ -41,14 +49,9 @@ if [ "$#" -eq 2 ]; then
 
    case "${number_of_cores}" in
        ("" | *[!0-9]*)
-           echo -e "\e[1;31m Error:\e[0m"' Invalid value for the number of cores: ' ${number_of_cores} '. It should be [0-9][0-9]' >&2
+           echo -e "\e[1;31m Error:\e[0m"' Invalid value for the number of cores: ' ${number_of_cores} '. It should be [0-9][0-9][0-9]' >&2
            exit 1
    esac
-
-   if [ "${number_of_cores}" -lt 1 ] || [ "$1" -gt 100 ]; then
-       echo -e "\e[1;31m Error:\e[0m"' The value of number of cores ' ${number_of_cores} ' is out of range. Allowed range: 1-100.' >&2
-       exit 1
-   fi
 
    if [ ! -d ${dir_with_cmorised_data} ]; then
     echo
@@ -59,13 +62,8 @@ if [ "$#" -eq 2 ]; then
 
 
    # First run cmor-fixer in the save dry-run mode in order to figure out if there is any file with an error at all:
-   ./cmor-fixer.py --dry --verbose --olist --npp ${number_of_cores} ${dir_with_cmorised_data} &> cmor-fixer-messages-1.log
+   ./cmor-fixer.py --dry --verbose --olist ${logdir} --npp ${number_of_cores} ${dir_with_cmorised_data} &> ${log_1_filename}
 
-   # For testing the script for the non-empty olist case or the case the olists differ:
-  #echo ' Make non-empty for test only.' >> ${olist_1_filename}
-  #more bup-list-of-modified-files-3.txt > ${olist_1_filename}
-   
-  #sleep 1
    if [[ ! -e ${olist_1_filename} ]] ; then
     echo
     echo -e "\e[1;31m Error:\e[0m"' the file ' ${olist_1_filename} ' should have been produced.'
@@ -85,7 +83,7 @@ if [ "$#" -eq 2 ]; then
    fi
 
    # Create, before really applying the changes, the olist for the --forceid case:
-   ./cmor-fixer.py --dry --verbose --forceid --olist --npp ${number_of_cores} ${dir_with_cmorised_data} &> cmor-fixer-messages-2.log
+   ./cmor-fixer.py --dry --verbose --forceid --olist ${logdir} --npp ${number_of_cores} ${dir_with_cmorised_data} &> ${log_2_filename}
 
    if [[ ! -e ${olist_2_filename} ]] ; then
     echo
@@ -95,7 +93,7 @@ if [ "$#" -eq 2 ]; then
    fi
 
    # Apply the changes the olist for the --forceid case:
-   ./cmor-fixer.py --verbose --forceid --olist --npp ${number_of_cores} ${dir_with_cmorised_data} &> cmor-fixer-messages-3.log
+   ./cmor-fixer.py --verbose --forceid --olist ${logdir} --npp ${number_of_cores} ${dir_with_cmorised_data} &> ${log_3_filename}
 
    if [[ ! -e ${olist_3_filename} ]] ; then
     echo
@@ -120,7 +118,7 @@ if [ "$#" -eq 2 ]; then
 
 
    # Final check: Check whether after modifying the errors, the dataser is now error free:
-   ./cmor-fixer.py --dry --verbose --olist --npp ${number_of_cores} ${dir_with_cmorised_data} &> cmor-fixer-messages-4.log
+   ./cmor-fixer.py --dry --verbose --olist ${logdir} --npp ${number_of_cores} ${dir_with_cmorised_data} &> ${log_4_filename}
 
    if [[ ! -e ${olist_4_filename} ]] ; then
     echo
