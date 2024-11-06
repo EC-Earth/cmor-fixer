@@ -33,7 +33,9 @@ orca025_grid_shape = (1050, 1442, 4)
 
 def load_vertices(vertices_file_name):
     # Loading once at the start the NEMO longitude and latitude vertices from a netcdf file:
-    nemo_vertices_file_name=os.path.join("nemo-vertices", vertices_file_name)
+    scriptdir=os.path.dirname(__file__)
+    nemoverticespath=scriptdir+"/nemo-vertices"
+    nemo_vertices_file_name=os.path.join(nemoverticespath, vertices_file_name)
     if os.path.isfile(nemo_vertices_file_name) == False: print(error_message, ' The netcdf data file ', nemo_vertices_file_name, '  does not exist.\n'); sys.exit()
     nemo_vertices_netcdf_file = netCDF4.Dataset(nemo_vertices_file_name, 'r')
     lon_vertices_from_nemo_tmp = nemo_vertices_netcdf_file.variables["vertices_longitude"]
