@@ -24,6 +24,8 @@ log = logging.getLogger(os.path.basename(__file__))
 
 skipped_attributes = ["source", "comment"]
 
+log_overview_modified_attributes = ''
+
 # The vertices fields on an ORCA1 grid have the following dimension sizes (used to check whether the considered grid is ORCA1):
 orca1_grid_shape   = ( 292,  362, 4)
 orca025_grid_shape = (1050, 1442, 4)
@@ -61,6 +63,7 @@ lon_vertices_from_nemo_orca025_v_grid = np.where(lon_vertices_from_nemo_orca025_
 
 
 def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_attributes=False):
+    global log_overview_modified_attributes
     ds = netCDF4.Dataset(path, "r+" if write else "r")
     modified = forceid
     if getattr(ds, "grid_label") == "gr":
@@ -212,6 +215,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
             if (not hasattr(ds, attname) and add_attributes) or \
                     (hasattr(ds, attname) and str(getattr(ds, attname)) != str(attval)):
                 log.info("Setting metadata field %s to %s in %s" % (attname, attval, ds.filepath()))
+                log_overview_modified_attributes=log_overview_modified_attributes+'Set ' + attname + ' to ' + attval + '. '
                 if write:
                     setattr(ds, attname, attval)
                 modified = True
@@ -222,11 +226,18 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
             setattr(ds, "tracking_id", tr_id)
     if modified:
         history = getattr(ds, "history", "")
+        creation_date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
         log.info("Appending message about modification to the history attribute.")
         log.info('Set attribute %s to %s' % (latest_applied_version, script_version))
         if write:
+            if log_overview_modified_attributes == '':
+             log_overview_modified_attributes = 'No attribute has been modified.'
             setattr(ds, latest_applied_version, script_version)
             setattr(ds, "history", history + 'The %s version %s script has been applied.' % (script_name, script_version))
+            setattr(ds, "history", history + '%s: Metadata update by applying the %s %s: %s \n' % (creation_date, script_name, script_version, log_overview_modified_attributes))
+
+            setattr(ds, "history", history + '%s: The %s version %s script has been applied. Metadata updates: %s \n' % (creation_date, script_name, script_version, log_overview_modified_attributes))
+
     ds.close()
     return modified
 
