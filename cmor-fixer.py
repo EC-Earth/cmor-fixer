@@ -233,9 +233,6 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
             if log_overview_modified_attributes == '':
              log_overview_modified_attributes = 'No attribute has been modified.'
             setattr(ds, latest_applied_version, script_version)
-            setattr(ds, "history", history + 'The %s version %s script has been applied.' % (script_name, script_version))
-            setattr(ds, "history", history + '%s: Metadata update by applying the %s %s: %s \n' % (creation_date, script_name, script_version, log_overview_modified_attributes))
-
             setattr(ds, "history", history + '%s: The %s version %s script has been applied. Metadata updates: %s \n' % (creation_date, script_name, script_version, log_overview_modified_attributes))
 
     ds.close()
