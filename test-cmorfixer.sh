@@ -48,9 +48,9 @@
    verbose="--verbose"
    verbose=""
    if [ "${choice}" = "dry" ]; then
-   ./cmor-fixer.py ${verbose} --dry --forceid --olist --addattrs --npp 2 --meta ${METADATAFILE} ${CMORISEDDIR}
+   ./cmor-fixer.py ${verbose} --dry --forceid --olist --addattrs --npp 1 --meta ${METADATAFILE} ${CMORISEDDIR}
     else
-   ./cmor-fixer.py ${verbose}       --forceid --olist --addattrs --npp 2 --meta ${METADATAFILE} ${CMORISEDDIR}
+   ./cmor-fixer.py ${verbose}       --forceid --olist --addattrs --npp 1 --meta ${METADATAFILE} ${CMORISEDDIR}
    fi
 
    echo
