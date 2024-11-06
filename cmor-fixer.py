@@ -13,7 +13,9 @@ import datetime
 import multiprocessing
 from functools import partial
 
-version_cmorfixer = 'v3.0'
+script_version         = 'v3.0'
+script_name            = 'cmor-fixer'
+latest_applied_version = 'latest_applied_cmor_fixer_version'
 
 error_message   = '\n \033[91m' + 'Error:'   + '\033[0m'      # Red    error   message
 warning_message = '\n \033[93m' + 'Warning:' + '\033[0m'      # Yellow warning message
@@ -133,7 +135,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
     for key in ds.variables:
      if key == "vertices_longitude" and getattr(ds, "grid_label") == "gn":
       if ds.variables[key][...].shape != orca1_grid_shape and ds.variables[key][...].shape != orca025_grid_shape:
-       print(warning_message, 'The cmor-fixer currently only supports the vertices fix for the ORCA1 & ORCA025 grid. Here a different grid size is detected: ', ds.variables[key][...].shape, '\n')
+       print(warning_message, 'The', script_name, 'currently only supports the vertices fix for the ORCA1 & ORCA025 grid. Here a different grid size is detected: ', ds.variables[key][...].shape, '\n')
        break
       # Check and veritces fix for the ORCA1 grid:
       if ds.variables[key][...].shape == orca1_grid_shape:
@@ -167,7 +169,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
           ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca1_v_grid[...]  # Replacing the latitude  vertices
           modified = True
         else:
-         print(error_message, ' The cmor-fixer failed to determine the staggered grid in the procedure to fix the NEMO vertices. \n'); sys.exit()
+         print(error_message, ' The', script_name, 'failed to determine the staggered grid in the procedure to fix the NEMO vertices. \n'); sys.exit()
       # Check and veritces fix for the ORCA025 grid:
       if ds.variables[key][...].shape == orca025_grid_shape:
        # In order to detect whether the cmorised file contains vertices which are not based on the NEMO data (and thus have the
@@ -200,7 +202,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
           ds.variables["vertices_latitude"][...] = lat_vertices_from_nemo_orca025_v_grid[...]  # Replacing the latitude  vertices
           modified = True
         else:
-         print(error_message, ' The cmor-fixer failed to determine the staggered grid in the procedure to fix the NEMO vertices. \n'); sys.exit()
+         print(error_message, ' The', script_name, 'failed to determine the staggered grid in the procedure to fix the NEMO vertices. \n'); sys.exit()
 
     if metadata is not None:
         for key, val in metadata.items():
@@ -221,10 +223,10 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
     if modified:
         history = getattr(ds, "history", "")
         log.info("Appending message about modification to the history attribute.")
-        log.info("The latest applied cmor-fixer version attribute is set to: " + str(version_cmorfixer))
+        log.info('Set attribute %s to %s' % (latest_applied_version, script_version))
         if write:
-            setattr(ds, "latest_applied_cmor_fixer_version", version_cmorfixer)
-            setattr(ds, "history", history + 'The cmor-fixer version %s script has been applied.' % (version_cmorfixer))
+            setattr(ds, latest_applied_version, script_version)
+            setattr(ds, "history", history + 'The %s version %s script has been applied.' % (script_name, script_version))
     ds.close()
     return modified
 
