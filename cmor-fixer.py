@@ -221,7 +221,7 @@ def fix_file(path, write=True, keepid=False, forceid=False, metadata=None, add_a
                 log_overview_modified_attributes=log_overview_modified_attributes+'Set ' + attname + ' to ' + str(attval) + '. '
                 if write:
                     setattr(ds, attname, attval)
-                modified = True
+                    modified = True
     if modified and not keepid:
         tr_id = '/'.join(["hdl:21.14100", (str(uuid.uuid4()))])
         log.info("Setting tracking_id to %s for %s" % (tr_id, ds.filepath()))
