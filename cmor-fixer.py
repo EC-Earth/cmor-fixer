@@ -14,7 +14,7 @@ import multiprocessing
 from pathlib import Path
 from functools import partial
 
-script_version         = 'v3.0'
+script_version         = 'v4.0'
 script_name            = 'cmor-fixer'
 latest_applied_version = 'latest_applied_cmor_fixer_version'
 
