@@ -100,14 +100,14 @@ conda deactivate                          # Deactivating the active (here cmorfi
  conda deactivate
 ```
 
-##### Option 2: Alternatively, use the `cmor-fixer-save-mode-wrapper.sh` script:
+##### Option 2: Alternatively, use the `cmor-fixer-safe-mode-wrapper.sh` script:
 
-The `cmor-fixer-save-mode-wrapper.sh` script will only apply changes if at least one file with one error is detected in the entire dataset. In case an error is detected and the script will continue to apply changes, additional checks will be applied to check for interuptions during running the script.
+The `cmor-fixer-safe-mode-wrapper.sh` script will only apply changes if at least one file with one error is detected in the entire dataset. In case an error is detected and the script will continue to apply changes, additional checks will be applied to check for interuptions during running the script.
 ```
  # Activate the cmor-fixer conda environment:
  activatecmorfixer                         # The mamba-activate alias (as defined above)
   
- ./cmor-fixer-save-mode-wrapper.sh 1 CMIP6/
+ ./cmor-fixer-safe-mode-wrapper.sh 1 CMIP6/
  
  conda deactivate
 ```

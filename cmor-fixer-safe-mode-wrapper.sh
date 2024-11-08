@@ -13,7 +13,7 @@
 # ${2} the second  argument is path of the directory with the cmorised data.
 #
 # Run example:
-#  ./cmor-fixer-save-mode-wrapper.sh 1 CMIP6
+#  ./cmor-fixer-safe-mode-wrapper.sh 1 CMIP6
 #
 
 if [ "$#" -eq 2 ]; then
@@ -61,7 +61,7 @@ if [ "$#" -eq 2 ]; then
    fi
 
 
-   # First run cmor-fixer in the save dry-run mode in order to figure out if there is any file with an error at all:
+   # First run cmor-fixer in the safe dry-run mode in order to figure out if there is any file with an error at all:
    ./cmor-fixer.py --dry --verbose --olist ${logdir} --npp ${number_of_cores} ${dir_with_cmorised_data} &> ${log_1_filename}
 
    if [[ ! -e ${olist_1_filename} ]] ; then
