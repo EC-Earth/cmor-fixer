@@ -119,6 +119,11 @@ The `submit-cmor-fixer.sh` script is an `sbatch` template for a submit script wh
 sbatch submit-cmor-fixer.sh
 ```
 
+##### Option 4: Use a container:
+
+In collaboration with NSC a container environment has been established, see the [cmor-fixer wiki](https://github.com/EC-Earth/cmor-fixer/wiki/cmor%E2%80%90fixer-container) for its installation and its use.
+
+
 ### Apply cmor-fixer to data which has not been published before
 
 ```shell
