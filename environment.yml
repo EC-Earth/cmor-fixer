@@ -14,7 +14,7 @@
 name: cmorfixer
 channels:
 - conda-forge
-- defaults
+- nodefaults
 dependencies:
 - netcdf4
 - numpy
